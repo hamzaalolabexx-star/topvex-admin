@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Vex Admin - الإدارة الشاملة</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s; }
+        body.dark { background: #1a1a2e; color: #eee; }
+        body.light { background: #f0f2f5; color: #333; }
+        .container { padding: 15px; padding-top: 55px; max-width: 600px; margin: 0 auto; }
+        .header { text-align: center; padding: 20px; margin-bottom: 15px; border-radius: 12px; }
+        body.dark .header { background: #16213e; border: 1px solid #e94560; }
+        body.light .header { background: #fff; border: 1px solid #007bff; }
+        body.dark .header h2 { color: #e94560; }
+        body.light .header h2 { color: #007bff; }
+        .btn { display: block; width: 100%; padding: 13px; margin: 7px 0; border-radius: 10px; font-size: 15px; cursor: pointer; border: none; text-align: right; font-weight: 500; }
+        body.dark .btn { background: #0f3460; color: #eee; }
+        body.light .btn { background: #fff; color: #333; border: 1px solid #ddd; }
+        body.dark .btn:hover { background: #e94560; }
+        body.light .btn:hover { background: #007bff; color: #fff; }
+        .btn.danger { background: #e94560 !important; color: #fff !important; }
+        .btn.success { background: #2d6a4f !important; color: #fff !important; }
+        .btn.warning { background: #f0ad4e !important; color: #000 !important; }
+        .btn.info { background: #5bc0de !important; color: #000 !important; }
+        body.dark input, body.dark textarea, body.dark select { background: #16213e; color: #eee; border: 2px solid #0f3460; }
+        body.light input, body.light textarea, body.light select { background: #fff; color: #333; border: 2px solid #ddd; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; font-size: 14px; outline: none; }
+        input:focus, textarea:focus, select:focus { border-color: #e94560 !important; }
+        textarea { height: 80px; resize: vertical; }
+        .hidden { display: none !important; }
+        .error { color: #e94560; text-align: center; margin: 10px 0; font-size: 14px; }
+        .success-msg { color: #4caf50; text-align: center; margin: 10px 0; font-size: 14px; }
+        .theme-btn { position: fixed; top: 10px; left: 10px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 18px; z-index: 999; border: none; }
+        body.dark .theme-btn { background: #0f3460; color: #fff; }
+        body.light .theme-btn { background: #ddd; color: #333; }
+        .section { margin: 18px 0; }
+        .section-title { font-size: 16px; font-weight: bold; margin: 15px 0 8px; padding: 10px; border-radius: 8px; }
+        body.dark .section-title { background: #0a0a1a; color: #e94560; }
+        body.light .section-title { background: #e9ecef; color: #007bff; }
+        label { display: block; margin: 8px 0 4px; font-size: 13px; opacity: 0.9; font-weight: bold; }
+        .card { padding: 15px; border-radius: 12px; margin: 10px 0; }
+        body.dark .card { background: #16213e; }
+        body.light .card { background: #fff; border: 1px solid #ddd; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 15px; font-size: 12px; margin: 2px; }
+        body.dark .badge { background: #0f3460; }
+        body.light .badge { background: #e9ecef; }
+        hr { margin: 15px 0; opacity: 0.3; }
+    </style>
+</head>
+<body class="dark">
+    <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+
+    <!-- ============ صفحة تسجيل الدخول ============ -->
+    <div id="loginPage" class="container">
+        <div class="header">
+            <h2>🔐 Top Vex Admin</h2>
+            <p>لوحة الإدارة الشاملة</p>
+        </div>
+        <input type="password" id="password" placeholder="🔑 كلمة المرور">
+        <p class="error" id="errorMsg"></p>
+        <button class="btn success" onclick="checkPassword()">🔓 دخول</button>
+    </div>
+
+    <!-- ============ لوحة التحكم الرئيسية ============ -->
+    <div id="mainPanel" class="container hidden">
+        <div class="header">
+            <h2>🔷 Top Vex Card</h2>
+            <p>لوحة الإدارة الشاملة</p>
+            <p style="font-size:12px;opacity:0.7;">v21.0 MINI APP</p>
+        </div>
+        
+        <!-- 📊 الإحصائيات السريعة -->
+        <div class="section">
+            <div class="section-title">📊 الإحصائيات والتقارير</div>
+            <button class="btn" onclick="showPage('statsPage')">📊 عرض الإحصائيات الكاملة</button>
+            <button class="btn" onclick="sendCmd('report')">📋 تقرير مفصل حسب المصادر</button>
+            <button class="btn warning" onclick="sendCmd('sync_prices')">🔄 مزامنة الأسعار مع المصادر</button>
+        </div>
+
+        <!-- 👥 إدارة المستخدمين -->
+        <div class="section">
+            <div class="section-title">👥 إدارة المستخدمين</div>
+            <button class="btn" onclick="showPage('queryUserPage')">🔍 استعلام عن مستخدم</button>
+            <button class="btn warning" onclick="sendCmd('blocked_users')">🚫 عرض المحظورين</button>
+            <button class="btn" onclick="showPage('addAdminPage')">👑 إضافة أدمن جديد</button>
+            <button class="btn" onclick="showPage('removeAdminPage')">🗑 إزالة أدمن</button>
+            <button class="btn danger" onclick="showPage('blockUserPage')">🚫 حظر مستخدم</button>
+            <button class="btn success" onclick="showPage('unblockUserPage')">🔓 فك حظر مستخدم</button>
+            <button class="btn" onclick="showPage('promoteVipPage')">👑 ترقية مستخدم لـ VIP</button>
+        </div>
+
+        <!-- 💰 إدارة الرصيد -->
+        <div class="section">
+            <div class="section-title">💰 إدارة الرصيد</div>
+            <button class="btn success" onclick="showPage('addBalancePage')">💵 إضافة رصيد لمستخدم</button>
+            <button class="btn danger" onclick="showPage('removeBalancePage')">💸 سحب رصيد من مستخدم</button>
+        </div>
+
+        <!-- ⚙️ إعدادات البوت -->
+        <div class="section">
+            <div class="section-title">⚙️ إعدادات البوت</div>
+            <button class="btn" onclick="showPage('profitRatePage')">📊 تعيين نسبة الربح</button>
+            <button class="btn" onclick="showPage('welcomeMsgPage')">📝 تغيير رسالة الترحيب</button>
+            <button class="btn" onclick="showPage('stopMsgPage')">🔧 تغيير رسالة الإيقاف</button>
+            <button class="btn" onclick="showPage('supportUserPage')">📞 تغيير يوزر الدعم</button>
+            <button class="btn" onclick="showPage('startImagePage')">🖼 تعديل صورة البداية</button>
+            <button class="btn warning" onclick="sendCmd('toggle_status')">🔄 تشغيل/إيقاف البوت</button>
+        </div>
+
+        <!-- 📢 الإذاعة -->
+        <div class="section">
+            <div class="section-title">📢 الإذاعة</div>
+            <button class="btn warning" onclick="showPage('broadcastPage')">📢 إرسال رسالة إذاعة للجميع</button>
+        </div>
+
+        <!-- 📢 الاشتراك الإجباري -->
+        <div class="section">
+            <div class="section-title">📢 الاشتراك الإجباري</div>
+            <button class="btn" onclick="showPage('addChannelPage')">➕ إضافة قناة اشتراك إجباري</button>
+            <button class="btn danger" onclick="showPage('removeChannelPage')">🗑 حذف قناة</button>
+        </div>
+
+        <!-- 💳 طرق الدفع -->
+        <div class="section">
+            <div class="section-title">💳 طرق الدفع</div>
+            <button class="btn" onclick="showPage('addPaymentPage')">➕ إضافة طريقة دفع جديدة</button>
+            <button class="btn danger" onclick="showPage('removePaymentPage')">🗑 حذف طريقة دفع</button>
+        </div>
+
+        <!-- 👑 نظام VIP -->
+        <div class="section">
+            <div class="section-title">👑 نظام VIP</div>
+            <button class="btn" onclick="showPage('editVipPage')">⚙️ تعديل مستويات VIP</button>
+        </div>
+
+        <!-- 🔌 المصادر -->
+        <div class="section">
+            <div class="section-title">🔌 إدارة المصادر</div>
+            <button class="btn" onclick="sendCmd('list_sources')">📋 عرض المصادر المتاحة</button>
+            <button class="btn" onclick="showPage('addSourcePage')">➕ إضافة مصدر جديد</button>
+            <button class="btn danger" onclick="showPage('deleteSourcePage')">🗑 حذف مصدر</button>
+            <button class="btn" onclick="showPage('testSourcePage')">🔍 اختبار اتصال مصدر</button>
+            <button class="btn" onclick="showPage('sourceBalancePage')">💰 كشف رصيد مصدر</button>
+            <button class="btn" onclick="showPage('exportSourcePage')">📦 تصدير منتجات مصدر</button>
+            <button class="btn" onclick="showPage('checkOrderPage')">🔍 فحص حالة طلب في المصدر</button>
+            <button class="btn" onclick="showPage('testOrderPage')">🧪 اختبار إنشاء طلب</button>
+        </div>
+
+        <!-- 📦 المنتجات -->
+        <div class="section">
+            <div class="section-title">📦 إدارة المنتجات</div>
+            <button class="btn" onclick="sendCmd('auto_products')">🤖 عرض المنتجات التلقائية</button>
+            <button class="btn" onclick="sendCmd('manual_products')">✋ عرض المنتجات اليدوية</button>
+            <button class="btn success" onclick="showPage('addAutoProductPage')">➕ إضافة منتج تلقائي</button>
+            <button class="btn" onclick="showPage('addManualProductPage')">➕ إضافة منتج يدوي</button>
+            <button class="btn info" onclick="showPage('productImagesPage')">🖼 إدارة صور المنتجات</button>
+        </div>
+
+        <button class="btn danger" onclick="location.reload()" style="margin-top: 25px;">🚪 تسجيل خروج</button>
+        <br><br>
+    </div>
+
+    <!-- ============ الصفحات الفرعية ============ -->
+    
+    <!-- صفحة استعلام عن مستخدم -->
+    <div id="queryUserPage" class="container hidden">
+        <div class="header"><h2>🔍 استعلام عن مستخدم</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="queryUserId" placeholder="أدخل ايدي المستخدم">
+            <button class="btn" onclick="sendData('query_user', document.getElementById('queryUserId').value)">🔍 استعلام</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع للقائمة الرئيسية</button>
+    </div>
+
+    <!-- صفحة إضافة أدمن -->
+    <div id="addAdminPage" class="container hidden">
+        <div class="header"><h2>👑 إضافة أدمن جديد</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="addAdminId" placeholder="أدخل ايدي المستخدم">
+            <button class="btn success" onclick="sendData('add_admin', document.getElementById('addAdminId').value)">👑 ترقية إلى أدمن</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إزالة أدمن -->
+    <div id="removeAdminPage" class="container hidden">
+        <div class="header"><h2>🗑 إزالة أدمن</h2></div>
+        <div class="card">
+            <label>🆔 ايدي الأدمن المراد إزالته:</label>
+            <input type="number" id="removeAdminId" placeholder="أدخل ايدي الأدمن">
+            <button class="btn danger" onclick="sendData('remove_admin', document.getElementById('removeAdminId').value)">🗑 إزالة الأدمن</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة حظر مستخدم -->
+    <div id="blockUserPage" class="container hidden">
+        <div class="header"><h2>🚫 حظر مستخدم</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم المراد حظره:</label>
+            <input type="number" id="blockUserId" placeholder="أدخل ايدي المستخدم">
+            <button class="btn danger" onclick="sendData('block_user', document.getElementById('blockUserId').value)">🚫 حظر</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة فك حظر -->
+    <div id="unblockUserPage" class="container hidden">
+        <div class="header"><h2>🔓 فك حظر مستخدم</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="unblockUserId" placeholder="أدخل ايدي المستخدم">
+            <button class="btn success" onclick="sendData('unblock_user', document.getElementById('unblockUserId').value)">🔓 فك الحظر</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة ترقية VIP -->
+    <div id="promoteVipPage" class="container hidden">
+        <div class="header"><h2>👑 ترقية مستخدم إلى VIP</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="promoteVipId" placeholder="أدخل ايدي المستخدم">
+            <label>👑 مستوى VIP:</label>
+            <select id="vipLevel">
+                <option value="1">VIP 1 - خصم 5%</option>
+                <option value="2">VIP 2 - خصم 10%</option>
+                <option value="3">VIP 3 - خصم 15%</option>
+                <option value="4">VIP 4 - خصم 20%</option>
+                <option value="5">VIP 5 - خصم 25%</option>
+            </select>
+            <button class="btn success" onclick="sendData('promote_vip', document.getElementById('promoteVipId').value + '|' + document.getElementById('vipLevel').value)">👑 ترقية</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة رصيد -->
+    <div id="addBalancePage" class="container hidden">
+        <div class="header"><h2>💵 إضافة رصيد</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="addBalUserId" placeholder="أدخل ايدي المستخدم">
+            <label>💰 المبلغ (دولار):</label>
+            <input type="number" id="addBalAmount" placeholder="أدخل المبلغ" step="0.01">
+            <button class="btn success" onclick="sendData('add_balance', document.getElementById('addBalUserId').value + '|' + document.getElementById('addBalAmount').value)">💵 إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة سحب رصيد -->
+    <div id="removeBalancePage" class="container hidden">
+        <div class="header"><h2>💸 سحب رصيد</h2></div>
+        <div class="card">
+            <label>🆔 ايدي المستخدم:</label>
+            <input type="number" id="remBalUserId" placeholder="أدخل ايدي المستخدم">
+            <label>💰 المبلغ (دولار):</label>
+            <input type="number" id="remBalAmount" placeholder="أدخل المبلغ" step="0.01">
+            <button class="btn danger" onclick="sendData('remove_balance', document.getElementById('remBalUserId').value + '|' + document.getElementById('remBalAmount').value)">💸 سحب</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة نسبة الربح -->
+    <div id="profitRatePage" class="container hidden">
+        <div class="header"><h2>📊 تعيين نسبة الربح</h2></div>
+        <div class="card">
+            <label>📊 نسبة الربح (%):</label>
+            <input type="number" id="profitRate" placeholder="أدخل النسبة (%)" value="10" step="0.1">
+            <button class="btn success" onclick="sendData('profit_rate', document.getElementById('profitRate').value)">💾 حفظ</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة رسالة الترحيب -->
+    <div id="welcomeMsgPage" class="container hidden">
+        <div class="header"><h2>📝 تغيير رسالة الترحيب</h2></div>
+        <div class="card">
+            <label>📝 رسالة الترحيب:</label>
+            <textarea id="welcomeMsg" placeholder="استخدم {name}, {id}, {balance}, {username}, {vip}"></textarea>
+            <button class="btn success" onclick="sendData('welcome_msg', document.getElementById('welcomeMsg').value)">💾 حفظ</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة رسالة الإيقاف -->
+    <div id="stopMsgPage" class="container hidden">
+        <div class="header"><h2>🔧 تغيير رسالة الإيقاف</h2></div>
+        <div class="card">
+            <label>🔧 رسالة الإيقاف:</label>
+            <textarea id="stopMsg" placeholder="رسالة تظهر عند إيقاف البوت"></textarea>
+            <button class="btn success" onclick="sendData('stop_msg', document.getElementById('stopMsg').value)">💾 حفظ</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة يوزر الدعم -->
+    <div id="supportUserPage" class="container hidden">
+        <div class="header"><h2>📞 تغيير يوزر الدعم</h2></div>
+        <div class="card">
+            <label>📞 يوزر الدعم (بدون @):</label>
+            <input type="text" id="supportUser" placeholder="TopVexSupport">
+            <button class="btn success" onclick="sendData('support_user', document.getElementById('supportUser').value)">💾 حفظ</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة صورة البداية -->
+    <div id="startImagePage" class="container hidden">
+        <div class="header"><h2>🖼 تعديل صورة البداية</h2></div>
+        <div class="card">
+            <p style="text-align:center;">📸 أرسل صورة البداية من البوت مباشرة</p>
+            <p style="text-align:center;opacity:0.7;">استخدم أمر /admin في البوت</p>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة الإذاعة -->
+    <div id="broadcastPage" class="container hidden">
+        <div class="header"><h2>📢 إذاعة للجميع</h2></div>
+        <div class="card">
+            <label>📢 نص الإذاعة:</label>
+            <textarea id="broadcastMsg" placeholder="أدخل نص الإذاعة..."></textarea>
+            <button class="btn danger" onclick="sendData('broadcast', document.getElementById('broadcastMsg').value)">📢 إرسال للجميع</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة قناة -->
+    <div id="addChannelPage" class="container hidden">
+        <div class="header"><h2>➕ إضافة قناة</h2></div>
+        <div class="card">
+            <label>🆔 ايدي القناة (سالب):</label>
+            <input type="text" id="channelId" placeholder="-100xxxxxxxxx">
+            <label>📛 اسم القناة:</label>
+            <input type="text" id="channelName" placeholder="اسم القناة">
+            <label>🔗 رابط القناة:</label>
+            <input type="text" id="channelLink" placeholder="https://t.me/xxxx">
+            <button class="btn success" onclick="sendData('add_channel', document.getElementById('channelId').value + '|' + document.getElementById('channelName').value + '|' + document.getElementById('channelLink').value)">➕ إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة حذف قناة -->
+    <div id="removeChannelPage" class="container hidden">
+        <div class="header"><h2>🗑 حذف قناة</h2></div>
+        <div class="card">
+            <label>🆔 رقم القناة في النظام:</label>
+            <input type="number" id="delChannelId" placeholder="أدخل رقم القناة">
+            <button class="btn danger" onclick="sendData('remove_channel', document.getElementById('delChannelId').value)">🗑 حذف</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة طريقة دفع -->
+    <div id="addPaymentPage" class="container hidden">
+        <div class="header"><h2>➕ إضافة طريقة دفع</h2></div>
+        <div class="card">
+            <label>💳 اسم الطريقة:</label>
+            <input type="text" id="payName" placeholder="مثال: تحويل بنكي">
+            <label>🏧 رقم المحفظة:</label>
+            <input type="text" id="payWallet" placeholder="رقم الحساب">
+            <label>📝 تعليمات:</label>
+            <textarea id="payInstructions" placeholder="تعليمات الدفع..."></textarea>
+            <label>💱 سعر الصرف (1$ = ? ل.س):</label>
+            <input type="number" id="payRate" placeholder="10000" value="0">
+            <button class="btn success" onclick="sendData('add_payment', document.getElementById('payName').value + '|' + document.getElementById('payWallet').value + '|' + document.getElementById('payInstructions').value + '|' + document.getElementById('payRate').value)">➕ إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة حذف طريقة دفع -->
+    <div id="removePaymentPage" class="container hidden">
+        <div class="header"><h2>🗑 حذف طريقة دفع</h2></div>
+        <div class="card">
+            <label>🆔 رقم طريقة الدفع:</label>
+            <input type="number" id="delPayId" placeholder="أدخل رقم طريقة الدفع">
+            <button class="btn danger" onclick="sendData('remove_payment', document.getElementById('delPayId').value)">🗑 حذف</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة تعديل VIP -->
+    <div id="editVipPage" class="container hidden">
+        <div class="header"><h2>⚙️ تعديل مستويات VIP</h2></div>
+        <div class="card">
+            <label>👑 مستوى VIP:</label>
+            <select id="editVipLevel">
+                <option value="1">VIP 1</option><option value="2">VIP 2</option>
+                <option value="3">VIP 3</option><option value="4">VIP 4</option>
+                <option value="5">VIP 5</option>
+            </select>
+            <label>💰 نسبة الخصم (%):</label>
+            <input type="number" id="editVipDiscount" placeholder="الخصم %" min="0" max="100">
+            <label>📦 عدد الطلبات للترقية:</label>
+            <input type="number" id="editVipOrders" placeholder="عدد الطلبات" min="0">
+            <button class="btn success" onclick="sendData('edit_vip', document.getElementById('editVipLevel').value + '|' + document.getElementById('editVipDiscount').value + '|' + document.getElementById('editVipOrders').value)">💾 حفظ</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة مصدر -->
+    <div id="addSourcePage" class="container hidden">
+        <div class="header"><h2>➕ إضافة مصدر جديد</h2></div>
+        <div class="card">
+            <label>📝 اسم المصدر:</label>
+            <input type="text" id="srcName" placeholder="اسم المصدر">
+            <label>🌐 رابط API:</label>
+            <input type="text" id="srcUrl" placeholder="https://example.com/api/client">
+            <label>🔑 API Token:</label>
+            <input type="text" id="srcToken" placeholder="التوكن">
+            <button class="btn success" onclick="sendData('add_source', document.getElementById('srcName').value + '|' + document.getElementById('srcUrl').value + '|' + document.getElementById('srcToken').value)">➕ إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة حذف مصدر -->
+    <div id="deleteSourcePage" class="container hidden">
+        <div class="header"><h2>🗑 حذف مصدر</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="delSrcId" placeholder="أدخل رقم المصدر">
+            <button class="btn danger" onclick="sendData('delete_source', document.getElementById('delSrcId').value)">🗑 حذف</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة اختبار مصدر -->
+    <div id="testSourcePage" class="container hidden">
+        <div class="header"><h2>🔍 اختبار اتصال مصدر</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="testSrcId" placeholder="أدخل رقم المصدر">
+            <button class="btn" onclick="sendData('test_source', document.getElementById('testSrcId').value)">🔍 اختبار</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة كشف رصيد مصدر -->
+    <div id="sourceBalancePage" class="container hidden">
+        <div class="header"><h2>💰 كشف رصيد مصدر</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="balSrcId" placeholder="أدخل رقم المصدر">
+            <button class="btn" onclick="sendData('source_balance', document.getElementById('balSrcId').value)">💰 كشف الرصيد</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة تصدير منتجات -->
+    <div id="exportSourcePage" class="container hidden">
+        <div class="header"><h2>📦 تصدير منتجات مصدر</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="exportSrcId" placeholder="أدخل رقم المصدر">
+            <button class="btn" onclick="sendData('export_source', document.getElementById('exportSrcId').value)">📦 تصدير</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة فحص طلب -->
+    <div id="checkOrderPage" class="container hidden">
+        <div class="header"><h2>🔍 فحص حالة طلب</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="checkOrderSrcId" placeholder="أدخل رقم المصدر">
+            <label>📦 رقم الطلب (Order ID):</label>
+            <input type="text" id="checkOrderId" placeholder="أدخل رقم الطلب">
+            <button class="btn" onclick="sendData('check_order', document.getElementById('checkOrderSrcId').value + '|' + document.getElementById('checkOrderId').value)">🔍 فحص</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة اختبار طلب -->
+    <div id="testOrderPage" class="container hidden">
+        <div class="header"><h2>🧪 اختبار إنشاء طلب</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="testOrderSrcId" placeholder="أدخل رقم المصدر">
+            <label>📦 Product ID:</label>
+            <input type="text" id="testOrderProductId" placeholder="آيدي المنتج">
+            <label>👤 Player ID:</label>
+            <input type="text" id="testOrderPlayerId" placeholder="آيدي اللاعب" value="0">
+            <label>🔢 الكمية:</label>
+            <input type="number" id="testOrderQty" placeholder="الكمية" value="1">
+            <button class="btn" onclick="sendData('test_order', document.getElementById('testOrderSrcId').value + '|' + document.getElementById('testOrderProductId').value + '|' + document.getElementById('testOrderPlayerId').value + '|' + document.getElementById('testOrderQty').value)">🧪 اختبار</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة منتج تلقائي -->
+    <div id="addAutoProductPage" class="container hidden">
+        <div class="header"><h2>➕ إضافة منتج تلقائي</h2></div>
+        <div class="card">
+            <label>🆔 رقم المصدر:</label>
+            <input type="number" id="autoSrcId" placeholder="أدخل رقم المصدر">
+            <label>📂 رقم القسم:</label>
+            <select id="autoCatId">
+                <option value="1">الالعاب</option><option value="2">التطبيقات</option>
+                <option value="3">خدمات عامة</option><option value="4">بطاقات و اكواد</option>
+                <option value="5">Social media</option><option value="6">قسم الارقام</option>
+                <option value="7">كازية الارصدة</option><option value="8">اشتراكات شاشه</option>
+                <option value="9">قسم بروكسيات</option>
+            </select>
+            <label>📦 اسم المنتج:</label>
+            <input type="text" id="autoProdName" placeholder="اسم المنتج">
+            <label>🆔 آيدي المنتج في المصدر:</label>
+            <input type="text" id="autoApiId" placeholder="Product ID">
+            <label>📝 اسم السلعة:</label>
+            <input type="text" id="autoItemName" placeholder="اسم السلعة">
+            <label>🆔 آيدي السلعة في المصدر:</label>
+            <input type="text" id="autoItemApiId" placeholder="Item ID">
+            <button class="btn success" onclick="sendData('add_auto_product', document.getElementById('autoSrcId').value + '|' + document.getElementById('autoCatId').value + '|' + document.getElementById('autoProdName').value + '|' + document.getElementById('autoApiId').value + '|' + document.getElementById('autoItemName').value + '|' + document.getElementById('autoItemApiId').value)">➕ إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة إضافة منتج يدوي -->
+    <div id="addManualProductPage" class="container hidden">
+        <div class="header"><h2>➕ إضافة منتج يدوي</h2></div>
+        <div class="card">
+            <label>📂 رقم القسم:</label>
+            <select id="manualCatId">
+                <option value="1">الالعاب</option><option value="2">التطبيقات</option>
+                <option value="3">خدمات عامة</option><option value="4">بطاقات و اكواد</option>
+                <option value="5">Social media</option><option value="6">قسم الارقام</option>
+                <option value="7">كازية الارصدة</option><option value="8">اشتراكات شاشه</option>
+                <option value="9">قسم بروكسيات</option>
+            </select>
+            <label>📦 اسم المنتج:</label>
+            <input type="text" id="manualProdName" placeholder="اسم المنتج">
+            <label>📝 اسم السلعة:</label>
+            <input type="text" id="manualItemName" placeholder="اسم السلعة">
+            <label>💰 السعر (دولار):</label>
+            <input type="number" id="manualPrice" placeholder="السعر" step="0.01">
+            <label>🔢 هل بعداد؟</label>
+            <select id="manualIsCounter">
+                <option value="0">لا</option><option value="1">نعم</option>
+            </select>
+            <label>🔢 أقل كمية:</label>
+            <input type="number" id="manualMinQty" value="1">
+            <label>🔢 أعلى كمية:</label>
+            <input type="number" id="manualMaxQty" value="10000">
+            <label>📋 وصف:</label>
+            <textarea id="manualDesc" placeholder="وصف السلعة..."></textarea>
+            <button class="btn success" onclick="sendData('add_manual_product', document.getElementById('manualCatId').value + '|' + document.getElementById('manualProdName').value + '|' + document.getElementById('manualItemName').value + '|' + document.getElementById('manualPrice').value + '|' + document.getElementById('manualIsCounter').value + '|' + document.getElementById('manualMinQty').value + '|' + document.getElementById('manualMaxQty').value + '|' + document.getElementById('manualDesc').value)">➕ إضافة</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة صور المنتجات -->
+    <div id="productImagesPage" class="container hidden">
+        <div class="header"><h2>🖼 إدارة صور المنتجات</h2></div>
+        <div class="card">
+            <label>📂 رقم القسم:</label>
+            <select id="imgCatId">
+                <option value="1">الالعاب</option><option value="2">التطبيقات</option>
+                <option value="3">خدمات عامة</option><option value="4">بطاقات و اكواد</option>
+                <option value="5">Social media</option><option value="6">قسم الارقام</option>
+                <option value="7">كازية الارصدة</option><option value="8">اشتراكات شاشه</option>
+                <option value="9">قسم بروكسيات</option>
+            </select>
+            <button class="btn" onclick="sendData('product_images', document.getElementById('imgCatId').value)">🖼 عرض منتجات القسم</button>
+        </div>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <!-- صفحة الإحصائيات -->
+    <div id="statsPage" class="container hidden">
+        <div class="header"><h2>📊 الإحصائيات الكاملة</h2></div>
+        <div class="card" id="statsContent">
+            <p style="text-align:center;">⏳ جاري التحميل...</p>
+        </div>
+        <button class="btn" onclick="sendCmd('stats')">🔄 تحديث الإحصائيات</button>
+        <button class="btn" onclick="showPage('mainPanel')">🔙 رجوع</button>
+    </div>
+
+    <script>
+        const PASSWORD = "topvex2024admin";
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+            const pages = document.querySelectorAll('.container:not(.hidden)');
+            if (pages.length > 0) {
+                const currentPage = pages[0];
+                if (currentPage.id !== 'mainPanel' && currentPage.id !== 'loginPage') {
+                    showPage('mainPanel');
+                } else {
+                    tg.close();
+                }
+            }
+        });
+
+        // ============ AUTH ============
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPanel').classList.remove('hidden');
+        }
+
+        function checkPassword() {
+            const pass = document.getElementById('password').value;
+            if (pass === PASSWORD) {
+                sessionStorage.setItem('adminAuth', 'true');
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainPanel').classList.remove('hidden');
+                document.getElementById('errorMsg').textContent = '';
+            } else {
+                document.getElementById('errorMsg').textContent = '❌ كلمة مرور خاطئة!';
+            }
+        }
+
+        // ============ THEME ============
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            document.body.classList.toggle('light');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark');
+            document.body.classList.add('light');
+        }
+
+        // ============ NAVIGATION ============
+        function showPage(pageId) {
+            document.querySelectorAll('.container').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // ============ SEND COMMANDS ============
+        function sendCmd(cmd) {
+            tg.sendData(JSON.stringify({action: cmd}));
+            tg.close();
+        }
+
+        function sendData(cmd, data) {
+            const payload = JSON.stringify({action: cmd, data: data});
+            tg.sendData(payload);
+            tg.close();
+        }
+
+        // ============ RECEIVE DATA ============
+        tg.onEvent('mainButtonClicked', () => {
+            tg.sendData(JSON.stringify({action: 'main_button'}));
+        });
+
+        // Listen for incoming data from bot
+        window.addEventListener('message', (event) => {
+            if (event.data && typeof event.data === 'string') {
+                try {
+                    const response = JSON.parse(event.data);
+                    if (response.stats) {
+                        // Update stats page
+                        const statsContent = document.getElementById('statsContent');
+                        if (statsContent) {
+                            statsContent.innerHTML = response.stats;
+                            showPage('statsPage');
+                        }
+                    }
+                } catch(e) {}
+            }
+        });
+    </script>
+</body>
+</html>
