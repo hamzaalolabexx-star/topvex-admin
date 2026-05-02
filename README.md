@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Vex Admin</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s; }
+        body.dark { background: #1a1a2e; color: #eee; }
+        body.light { background: #f0f2f5; color: #333; }
+        .container { padding: 15px; padding-top: 50px; }
+        .header { text-align: center; padding: 20px; margin-bottom: 15px; }
+        body.dark .header { border-bottom: 2px solid #e94560; }
+        body.light .header { border-bottom: 2px solid #007bff; }
+        body.dark .header h2 { color: #e94560; }
+        body.light .header h2 { color: #007bff; }
+        .btn { display: block; width: 100%; padding: 12px; margin: 6px 0; border-radius: 10px; font-size: 15px; cursor: pointer; border: none; }
+        body.dark .btn { background: #0f3460; color: #eee; }
+        body.light .btn { background: #fff; color: #333; border: 1px solid #ddd; }
+        body.dark .btn:hover { background: #e94560; }
+        body.light .btn:hover { background: #007bff; color: #fff; }
+        .btn.danger { background: #e94560 !important; color: #fff !important; }
+        .btn.success { background: #2d6a4f !important; color: #fff !important; }
+        .btn.warning { background: #f0ad4e !important; color: #000 !important; }
+        body.dark input, body.dark textarea, body.dark select { background: #16213e; color: #eee; border: 2px solid #0f3460; }
+        body.light input, body.light textarea, body.light select { background: #fff; color: #333; border: 2px solid #ddd; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; font-size: 14px; }
+        textarea { height: 80px; resize: vertical; }
+        .hidden { display: none; }
+        .error { color: #e94560; text-align: center; margin: 10px 0; }
+        .success-msg { color: #4caf50; text-align: center; margin: 10px 0; }
+        .theme-btn { position: fixed; top: 10px; left: 10px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 18px; z-index: 999; border: none; }
+        body.dark .theme-btn { background: #0f3460; color: #fff; }
+        body.light .theme-btn { background: #ddd; color: #333; }
+        .section { margin: 15px 0; }
+        .section-title { font-size: 16px; font-weight: bold; margin: 15px 0 8px; padding: 8px; border-radius: 8px; }
+        body.dark .section-title { background: #0a0a1a; }
+        body.light .section-title { background: #e9ecef; }
+        label { display: block; margin: 8px 0 4px; font-size: 13px; opacity: 0.8; }
+    </style>
+</head>
+<body class="dark">
+    <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+
+    <!-- تسجيل الدخول -->
+    <div id="loginPage" class="container">
+        <div class="header"><h2>🔐 Top Vex Admin</h2><p>أدخل كلمة المرور</p></div>
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <p class="error" id="errorMsg"></p>
+        <button class="btn" onclick="checkPassword()">🔓 دخول</button>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="adminPanel" class="container hidden">
+        <div class="header"><h2>🔷 Top Vex Card</h2><p>لوحة الإدارة الشاملة</p></div>
+        
+        <!-- إحصائيات سريعة -->
+        <div class="section">
+            <div class="section-title">📊 الإحصائيات السريعة</div>
+            <button class="btn" onclick="sendCmd('stats')">📊 عرض الإحصائيات الكاملة</button>
+            <button class="btn" onclick="sendCmd('report')">📋 تقرير مفصل حسب المصادر</button>
+        </div>
+
+        <!-- إدارة المستخدمين -->
+        <div class="section">
+            <div class="section-title">👥 إدارة المستخدمين</div>
+            <button class="btn" onclick="sendCmd('query_user')">🔍 استعلام عن مستخدم</button>
+            <button class="btn warning" onclick="sendCmd('blocked_users')">🚫 عرض المحظورين</button>
+            <button class="btn" onclick="sendCmd('add_admin')">👑 إضافة أدمن جديد</button>
+            <button class="btn" onclick="sendCmd('remove_admin')">🗑 إزالة أدمن</button>
+            <button class="btn danger" onclick="sendCmd('block_user')">🚫 حظر مستخدم</button>
+            <button class="btn success" onclick="sendCmd('unblock_user')">🔓 فك حظر مستخدم</button>
+            <button class="btn" onclick="sendCmd('promote_vip')">👑 ترقية مستخدم لـ VIP</button>
+        </div>
+
+        <!-- إدارة الرصيد -->
+        <div class="section">
+            <div class="section-title">💰 إدارة الرصيد</div>
+            <button class="btn success" onclick="sendCmd('add_balance')">💵 إضافة رصيد لمستخدم</button>
+            <button class="btn danger" onclick="sendCmd('remove_balance')">💸 سحب رصيد من مستخدم</button>
+        </div>
+
+        <!-- إعدادات البوت -->
+        <div class="section">
+            <div class="section-title">⚙️ إعدادات البوت</div>
+            <button class="btn" onclick="sendCmd('profit_rate')">📊 تعيين نسبة الربح</button>
+            <button class="btn" onclick="sendCmd('welcome_msg')">📝 تغيير رسالة الترحيب</button>
+            <button class="btn" onclick="sendCmd('stop_msg')">🔧 تغيير رسالة الإيقاف</button>
+            <button class="btn" onclick="sendCmd('support_user')">📞 تغيير يوزر الدعم</button>
+            <button class="btn" onclick="sendCmd('start_image')">🖼 تعديل صورة البداية</button>
+            <button class="btn warning" onclick="sendCmd('toggle_status')">🔄 تشغيل/إيقاف البوت</button>
+        </div>
+
+        <!-- الإذاعة -->
+        <div class="section">
+            <div class="section-title">📢 الإذاعة</div>
+            <button class="btn warning" onclick="sendCmd('broadcast')">📢 إرسال رسالة إذاعة للجميع</button>
+        </div>
+
+        <!-- الاشتراك الإجباري -->
+        <div class="section">
+            <div class="section-title">📢 الاشتراك الإجباري</div>
+            <button class="btn" onclick="sendCmd('add_channel')">➕ إضافة قناة</button>
+            <button class="btn danger" onclick="sendCmd('remove_channel')">🗑 حذف قناة</button>
+        </div>
+
+        <!-- طرق الدفع -->
+        <div class="section">
+            <div class="section-title">💳 طرق الدفع</div>
+            <button class="btn" onclick="sendCmd('add_payment')">➕ إضافة طريقة دفع جديدة</button>
+            <button class="btn danger" onclick="sendCmd('remove_payment')">🗑 حذف طريقة دفع</button>
+        </div>
+
+        <!-- نظام VIP -->
+        <div class="section">
+            <div class="section-title">👑 نظام VIP</div>
+            <button class="btn" onclick="sendCmd('edit_vip')">⚙️ تعديل مستويات VIP</button>
+        </div>
+
+        <!-- المصادر -->
+        <div class="section">
+            <div class="section-title">🔌 المصادر</div>
+            <button class="btn" onclick="sendCmd('list_sources')">📋 عرض المصادر</button>
+            <button class="btn" onclick="sendCmd('add_source')">➕ إضافة مصدر</button>
+            <button class="btn danger" onclick="sendCmd('delete_source')">🗑 حذف مصدر</button>
+            <button class="btn" onclick="sendCmd('test_source')">🔍 اختبار اتصال مصدر</button>
+            <button class="btn" onclick="sendCmd('source_balance')">💰 كشف رصيد مصدر</button>
+            <button class="btn" onclick="sendCmd('export_source')">📦 تصدير منتجات مصدر</button>
+            <button class="btn" onclick="sendCmd('check_order')">🔍 فحص حالة طلب</button>
+            <button class="btn" onclick="sendCmd('test_order')">🧪 اختبار إنشاء طلب</button>
+        </div>
+
+        <!-- المنتجات -->
+        <div class="section">
+            <div class="section-title">📦 المنتجات</div>
+            <button class="btn" onclick="sendCmd('auto_products')">🤖 المنتجات التلقائية</button>
+            <button class="btn" onclick="sendCmd('manual_products')">✋ المنتجات اليدوية</button>
+            <button class="btn success" onclick="sendCmd('add_auto')">➕ إضافة منتج تلقائي</button>
+            <button class="btn" onclick="sendCmd('add_manual')">➕ إضافة منتج يدوي</button>
+            <button class="btn warning" onclick="sendCmd('sync_prices')">🔄 مزامنة الأسعار</button>
+            <button class="btn" onclick="sendCmd('product_images')">🖼 إدارة صور المنتجات</button>
+        </div>
+
+        <button class="btn danger" onclick="location.reload()" style="margin-top: 20px;">🚪 خروج</button>
+    </div>
+
+    <script>
+        const PASSWORD = "topvex2024admin";
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+        
+        function checkPassword() {
+            const pass = document.getElementById('password').value;
+            if (pass === PASSWORD) {
+                sessionStorage.setItem('adminAuth', 'true');
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                document.getElementById('errorMsg').textContent = '❌ كلمة مرور خاطئة';
+            }
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            document.body.classList.toggle('light');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark');
+            document.body.classList.add('light');
+        }
+        
+        function sendCmd(cmd) {
+            tg.sendData(cmd);
+            tg.close();
+        }
+    </script>
+</body>
+</html>
