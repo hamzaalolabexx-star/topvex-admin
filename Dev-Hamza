@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر بوتات تلجرام المتقدم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #16213e;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .header h2 {
+            color: #e94560;
+            font-size: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #e94560;
+        }
+
+        .btn-secondary {
+            background: #0f3460;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #16213e;
+            padding: 15px;
+            border-left: 1px solid #0f3460;
+            overflow-y: auto;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 5px 0;
+            background: transparent;
+            border: 1px solid #0f3460;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: right;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-btn:hover {
+            background: #0f3460;
+        }
+
+        .sidebar-btn.active {
+            background: #e94560;
+            border-color: #e94560;
+        }
+
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            background: #16213e;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .file-name {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .code-editor {
+            flex: 1;
+            background: #1a1a2e;
+            color: #fff;
+            border: none;
+            padding: 20px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            direction: ltr;
+            line-height: 1.6;
+        }
+
+        .code-editor:focus {
+            outline: none;
+        }
+
+        .status-bar {
+            background: #16213e;
+            padding: 8px 20px;
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #0f3460;
+        }
+
+        .output-panel {
+            height: 200px;
+            background: #0a0a1a;
+            border-top: 2px solid #0f3460;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #16213e;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid #0f3460;
+        }
+
+        .modal-content h3 {
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #888;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a2e;
+            border: 1px solid #0f3460;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .buttons-list {
+            margin-top: 15px;
+        }
+
+        .button-item {
+            background: #1a1a2e;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button-item .btn-text {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .color-select {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            border-color: #fff;
+            transform: scale(1.2);
+        }
+
+        .color-red { background: #f44336; }
+        .color-blue { background: #2196F3; }
+        .color-green { background: #4CAF50; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🤖 محرر بوتات تلجرام</h2>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="analyzeCode()">🔍 تحليل</button>
+            <button class="btn btn-secondary" onclick="saveFile()">💾 حفظ</button>
+            <button class="btn btn-primary" onclick="loadFile()">📂 فتح</button>
+            <button class="btn btn-success" onclick="downloadFile()">⬇️ تحميل</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <button class="sidebar-btn active" onclick="switchPanel('editor')">📝 المحرر</button>
+            <button class="sidebar-btn" onclick="switchPanel('buttons')">🔘 الأزرار</button>
+            <button class="sidebar-btn" onclick="switchPanel('errors')">🔍 الأخطاء</button>
+            <button class="sidebar-btn" onclick="switchPanel('token')">🔑 التوكن</button>
+        </div>
+
+        <div class="editor-area">
+            <div class="editor-header">
+                <span class="file-name" id="fileName">bot_code.py</span>
+                <span style="color: #888;">Python</span>
+            </div>
+            
+            <textarea class="code-editor" id="codeEditor" placeholder="الصق كود البوت هنا..." spellcheck="false"></textarea>
+            
+            <div class="output-panel" id="outputPanel">
+                <span style="color: #4CAF50;">🟢 جاهز للعمل...</span>
+            </div>
+
+            <div class="status-bar">
+                <span id="lineCount">أسطر: 0</span>
+                <span id="charCount">حروف: 0</span>
+                <span id="buttonCounter">أزرار: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الأزرار -->
+    <div class="modal" id="buttonsModal">
+        <div class="modal-content">
+            <h3>🔘 إدارة الأزرار</h3>
+            <div class="buttons-list" id="buttonsList"></div>
+            <button class="btn btn-primary" onclick="addButton()" style="margin-top:15px;">➕ إضافة زر</button>
+            <button class="btn btn-secondary" onclick="closeModal()" style="margin-top:15px;">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- نافذة تغيير التوكن -->
+    <div class="modal" id="tokenModal">
+        <div class="modal-content">
+            <h3>🔑 تغيير التوكن</h3>
+            <div class="form-group">
+                <label>التوكن الجديد:</label>
+                <input type="text" id="newToken" placeholder="123456:ABC-DEF...">
+            </div>
+            <button class="btn btn-success" onclick="updateToken()">تحديث</button>
+            <button class="btn btn-secondary" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" style="display:none;" accept=".py">
+
+    <script>
+        let currentFileName = 'bot_code.py';
+
+        // تحديث الإحصائيات
+        document.getElementById('codeEditor').addEventListener('input', function() {
+            const code = this.value;
+            const lines = code.split('\n').length;
+            const chars = code.length;
+            const buttons = (code.match(/InlineKeyboardButton\s*\(\s*["']([^"']+)["']/g) || []).length;
+            
+            document.getElementById('lineCount').textContent = `أسطر: ${lines}`;
+            document.getElementById('charCount').textContent = `حروف: ${chars}`;
+            document.getElementById('buttonCounter').textContent = `أزرار: ${buttons}`;
+        });
+
+        // تبديل اللوحات
+        function switchPanel(panel) {
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            closeModal();
+            
+            if (panel === 'buttons') {
+                showButtonsPanel();
+            } else if (panel === 'errors') {
+                checkErrors();
+            } else if (panel === 'token') {
+                document.getElementById('tokenModal').classList.add('show');
+            }
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+        }
+
+        // تحليل الكود
+        function analyzeCode() {
+            const code = document.getElementById('codeEditor').value;
+            const lines = code.split('\n').length;
+            const buttons = extractButtons(code);
+            const errors = detectErrors(code);
+            
+            let output = '';
+            output += `📊 **تحليل الكود**\n\n`;
+            output += `📝 الأسطر: ${lines}\n`;
+            output += `🔘 الأزرار: ${buttons.length}\n`;
+            output += `❌ الأخطاء: ${errors.length}\n\n`;
+            
+            if (buttons.length > 0) {
+                output += `**الأزرار المكتشفة:**\n`;
+                buttons.forEach((btn, i) => {
+                    output += `${i+1}. ${btn}\n`;
+                });
+            }
+            
+            if (errors.length > 0) {
+                output += `\n**الأخطاء:**\n`;
+                errors.forEach(err => {
+                    output += `• ${err}\n`;
+                });
+            }
+            
+            document.getElementById('outputPanel').innerHTML = output.replace(/\n/g, '<br>');
+        }
+
+        function extractButtons(code) {
+            const matches = code.matchAll(/InlineKeyboardButton\s*\(\s*["']([^"']+)["']/g);
+            return [...new Set([...matches].map(m => m[1]))];
+        }
+
+        function detectErrors(code) {
+            const errors = [];
+            if (!code.includes('import')) errors.push('لا يوجد استيراد');
+            if (!code.includes('Application') && !code.includes('Updater')) errors.push('لا يوجد إطار عمل');
+            if (!code.includes('TOKEN') && !code.includes('BOT_TOKEN')) errors.push('لا يوجد توكن');
+            if (code.split('(').length !== code.split(')').length) errors.push('الأقواس غير متطابقة');
+            return errors;
+        }
+
+        // إدارة الأزرار
+        function showButtonsPanel() {
+            const code = document.getElementById('codeEditor').value;
+            const buttons = extractButtons(code);
+            
+            let html = '';
+            if (buttons.length === 0) {
+                html = '<p style="color:#888;">لا توجد أزرار</p>';
+            } else {
+                buttons.forEach(btn => {
+                    html += `
+                        <div class="button-item">
+                            <span class="btn-text">${btn}</span>
+                            <div>
+                                <div class="color-select">
+                                    <div class="color-option color-red" onclick="colorButton('${btn}', 'red')" title="أحمر"></div>
+                                    <div class="color-option color-blue" onclick="colorButton('${btn}', 'blue')" title="أزرق"></div>
+                                    <div class="color-option color-green" onclick="colorButton('${btn}', 'green')" title="أخضر"></div>
+                                    <button class="btn btn-primary" style="padding:5px 10px;font-size:12px;" onclick="deleteButton('${btn}')">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('buttonsList').innerHTML = html;
+            document.getElementById('buttonsModal').classList.add('show');
+        }
+
+        function colorButton(buttonText, color) {
+            const emoji = {red: '🔴', blue: '🔵', green: '🟢'}[color];
+            const editor = document.getElementById('codeEditor');
+            // استبدال الزر مع الحفاظ على باقي الخصائص
+            const regex = new RegExp(`(InlineKeyboardButton\\s*\\(\\s*["'])(${buttonText})(["'])`, 'g');
+            editor.value = editor.value.replace(regex, `$1${emoji} $2$3`);
+            showButtonsPanel();
+            addOutput(`✅ تم تلوين الزر "${buttonText}" باللون ${color}`);
+        }
+
+        function deleteButton(buttonText) {
+            const editor = document.getElementById('codeEditor');
+            const regex = new RegExp(`.*${buttonText}.*\\n?`, 'g');
+            editor.value = editor.value.replace(regex, '');
+            showButtonsPanel();
+            addOutput(`🗑️ تم حذف الزر "${buttonText}"`);
+        }
+
+        function addButton() {
+            const text = prompt('أدخل نص الزر:');
+            if (text) {
+                const callback = prompt('أدخل callback_data (أو اتركه فارغاً):', text);
+                const editor = document.getElementById('codeEditor');
+                const newBtn = `InlineKeyboardButton("${text}", callback_data="${callback || text}")`;
+                editor.value += '\n' + newBtn;
+                showButtonsPanel();
+                addOutput(`➕ تم إضافة الزر "${text}"`);
+            }
+        }
+
+        // فحص الأخطاء
+        function checkErrors() {
+            const code = document.getElementById('codeEditor').value;
+            const errors = detectErrors(code);
+            
+            if (errors.length === 0) {
+                document.getElementById('outputPanel').innerHTML = '<span style="color:#4CAF50;">✅ الكود سليم - لا توجد أخطاء</span>';
+            } else {
+                let html = '<span style="color:#f44336;">❌ الأخطاء المكتشفة:</span><br>';
+                errors.forEach(err => {
+                    html += `• ${err}<br>`;
+                });
+                document.getElementById('outputPanel').innerHTML = html;
+            }
+        }
+
+        // تغيير التوكن
+        function updateToken() {
+            const newToken = document.getElementById('newToken').value;
+            if (!newToken) {
+                alert('أدخل التوكن!');
+                return;
+            }
+            
+            const editor = document.getElementById('codeEditor');
+            editor.value = editor.value.replace(
+                /(TOKEN|BOT_TOKEN)\s*=\s*["'][^"']*["']/g,
+                `$1 = "${newToken}"`
+            );
+            
+            document.getElementById('tokenModal').classList.remove('show');
+            addOutput('✅ تم تحديث التوكن');
+        }
+
+        // حفظ وتحميل الملفات
+        function saveFile() {
+            const code = document.getElementById('codeEditor').value;
+            localStorage.setItem('savedCode', code);
+            localStorage.setItem('savedFileName', currentFileName);
+            addOutput('💾 تم حفظ الكود محلياً');
+        }
+
+        function loadFile() {
+            const saved = localStorage.getItem('savedCode');
+            const name = localStorage.getItem('savedFileName');
+            if (saved) {
+                document.getElementById('codeEditor').value = saved;
+                if (name) {
+                    currentFileName = name;
+                    document.getElementById('fileName').textContent = name;
+                }
+                addOutput('📂 تم تحميل الكود المحفوظ');
+                document.getElementById('codeEditor').dispatchEvent(new Event('input'));
+            } else {
+                addOutput('⚠️ لا يوجد كود محفوظ');
+            }
+        }
+
+        function downloadFile() {
+            const code = document.getElementById('codeEditor').value;
+            const blob = new Blob([code], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentFileName;
+            a.click();
+            URL.revokeObjectURL(url);
+            addOutput('⬇️ تم تحميل الملف');
+        }
+
+        // فتح ملف
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('codeEditor').value = e.target.result;
+                    currentFileName = file.name;
+                    document.getElementById('fileName').textContent = file.name;
+                    document.getElementById('codeEditor').dispatchEvent(new Event('input'));
+                    addOutput(`📂 تم فتح الملف: ${file.name}`);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function loadFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function addOutput(message) {
+            document.getElementById('outputPanel').innerHTML = `<span style="color:#4CAF50;">${message}</span>`;
+        }
+
+        // تحميل الكود المحفوظ تلقائياً
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem('savedCode');
+            const name = localStorage.getItem('savedFileName');
+            if (saved) {
+                document.getElementById('codeEditor').value = saved;
+                if (name) {
+                    currentFileName = name;
+                    document.getElementById('fileName').textContent = name;
+                }
+                document.getElementById('codeEditor').dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
+</body>
+</html> 
