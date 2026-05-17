@@ -1,0 +1,1014 @@
+html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ONE Store</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-glow: rgba(99, 102, 241, 0.6);
+            --bg: #0a0a0a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #252540;
+            --text: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: rgba(255,255,255,0.08);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.light-mode {
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: rgba(0,0,0,0.06);
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Cairo', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+            padding-bottom: 120px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: 
+                radial-gradient(ellipse at 25% 15%, rgba(99,102,241,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 55%, rgba(245,158,11,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(16,185,129,0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            transition: var(--transition);
+        }
+
+        .app { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 12px; }
+
+        /* ═══════════ الهيدر ═══════════ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 6px 18px;
+            margin-bottom: 4px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,10,10,0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            border-bottom: 1px solid var(--border);
+        }
+        body.light-mode .header { background: rgba(255,255,255,0.8); }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-logo {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            flex-shrink: 0;
+            box-shadow: var(--shadow-glow);
+            padding: 6px;
+        }
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .header-store-name {
+            font-size: 20px; font-weight: 900;
+            color: var(--text);
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .header-contact {
+            font-size: 9px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            opacity: 0.8;
+        }
+
+        .icon-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: relative;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+        .icon-btn:hover {
+            background: rgba(99,102,241,0.2);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+        .icon-btn:active { transform: scale(0.92); }
+        .icon-btn.admin-btn { display: none; }
+
+        /* ═══════════ الشريط العلوي الأيمن (ثيم + عملة + حول) ═══════════ */
+        .top-right-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 101;
+            background: var(--bg-card);
+            border-radius: 25px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow);
+        }
+        .top-right-bar .icon-btn {
+            width: 32px; height: 32px;
+            font-size: 12px;
+            border: none;
+        }
+
+        /* ═══════════ شريط بحث ═══════════ */
+        .search-bar {
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%; padding: 14px 18px 14px 44px;
+            border-radius: 28px;
+            border: 2px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        .search-bar input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.1), var(--shadow-glow);
+        }
+        .search-icon {
+            position: absolute;
+            right: 16px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            pointer-events: none;
+            font-size: 16px;
+        }
+
+        /* ═══════════ سلايدر ═══════════ */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+            margin-bottom: 14px;
+            height: 170px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .slider-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slider-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            cursor: pointer;
+        }
+        .slider-slide img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            pointer-events: none;
+        }
+        .slider-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .slider-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .slider-dot.active {
+            background: var(--primary);
+            width: 26px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* ═══════════ رسائل الترحيب ═══════════ */
+        .welcome-slider {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6, var(--primary-light));
+            border-radius: var(--radius-lg);
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: var(--shadow-glow);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .welcome-slider::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, 10px); }
+        }
+        .welcome-slider .msg {
+            position: absolute;
+            width: 100%;
+            padding: 0 24px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(24px);
+        }
+        .welcome-slider .msg.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════ الأقسام ═══════════ */
+        .section-title {
+            font-size: 18px; font-weight: 900;
+            margin: 24px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(to left, var(--primary), transparent);
+            border-radius: 3px;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .categories-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .cat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 120px;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text);
+            position: relative;
+            overflow: hidden;
+        }
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .cat-card:hover::before { opacity: 1; }
+        .cat-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow), var(--shadow-glow);
+            border-color: var(--primary);
+        }
+        .cat-card img {
+            width: 56px; height: 56px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .cat-card .cat-name {
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.3;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════ الصفحات ═══════════ */
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: var(--transition);
+        }
+        .back-btn:hover { background: var(--bg-card-hover); border-color: var(--primary); }
+
+        .item-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+            gap: 12px;
+        }
+        .item-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            transform: translateX(-4px);
+            box-shadow: var(--shadow);
+        }
+        .item-card .item-img {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+            pointer-events: none;
+        }
+        .item-info { flex: 1; min-width: 0; }
+        .item-name { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+        .item-desc { font-size: 12px; color: var(--text-secondary); }
+        .item-price {
+            font-weight: 900;
+            font-size: 16px;
+            color: var(--primary);
+            white-space: nowrap;
+            text-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* ═══════════ الشريط السفلي ═══════════ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 4px;
+            z-index: 100;
+            backdrop-filter: blur(24px);
+            border-radius: 20px;
+            gap: 0;
+            width: 94%;
+            max-width: 480px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        }
+        body.light-mode .bottom-nav {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            position: relative;
+            border-radius: 14px;
+            flex: 1;
+            max-width: 65px;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 4px;
+            box-shadow: 0 0 14px var(--primary-glow), 0 0 28px var(--primary-glow);
+            animation: glowPulse 2s infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 14px var(--primary-glow), 0 0 28px var(--primary-glow); }
+            50% { box-shadow: 0 0 22px var(--primary-glow), 0 0 44px var(--primary-glow); }
+        }
+        .nav-item.active i {
+            text-shadow: 0 0 14px var(--primary-glow);
+            transform: scale(1.15);
+        }
+        .nav-item i { font-size: 22px; transition: all 0.35s ease; }
+        .nav-item:hover { color: var(--primary-light); }
+
+        /* ═══════════ مودال ═══════════ */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 300;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal.show { display: flex; animation: fadeIn 0.25s ease; }
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 520px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 28px 22px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title { font-size: 20px; font-weight: 900; color: var(--primary-light); }
+        .modal-close {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-close:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 7px; font-weight: 700; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,0.1), var(--shadow-glow); }
+
+        .btn {
+            width: 100%; padding: 15px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: inherit;
+            font-size: 15px; font-weight: 800;
+            cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 8px; letter-spacing: 0.5px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; box-shadow: 0 4px 20px rgba(99,102,241,0.4); }
+        .btn-primary:hover { box-shadow: 0 8px 32px rgba(99,102,241,0.6); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+        .btn-outline:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
+
+        .product-desc-box {
+            background: rgba(99,102,241,0.1); border: 2px solid rgba(99,102,241,0.3);
+            border-radius: var(--radius-md); padding: 14px; margin: 12px 0;
+            text-align: center; font-size: 16px; font-weight: 800; color: var(--primary-light);
+        }
+        .original-price-box { text-align: center; text-decoration: line-through; color: var(--text-secondary); font-size: 15px; margin: 6px 0; opacity: 0.7; }
+        .final-price-box { text-align: center; font-size: 32px; font-weight: 900; color: var(--primary); margin: 10px 0; text-shadow: 0 0 20px var(--primary-glow); }
+        .wallet-box {
+            background: rgba(245,158,11,0.15); border: 2px solid rgba(245,158,11,0.4);
+            border-radius: var(--radius-md); padding: 14px; text-align: center; margin: 10px 0;
+            word-break: break-all; font-weight: 800; direction: ltr; font-size: 14px;
+        }
+        .instructions-box {
+            background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25);
+            border-radius: var(--radius-md); padding: 14px; margin: 10px 0;
+            font-size: 13px; white-space: pre-line; line-height: 1.9; color: var(--text-secondary);
+        }
+        .warning-box {
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            border-radius: var(--radius-sm); padding: 10px; margin: 10px 0;
+            color: var(--danger); font-size: 12px; font-weight: 700; text-align: center;
+        }
+
+        .toast {
+            position: fixed; top: 24px; left: 50%;
+            transform: translateX(-50%) translateY(-140px);
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 14px 24px;
+            font-weight: 800; font-size: 14px; z-index: 999;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center; box-shadow: var(--shadow); backdrop-filter: blur(20px);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+
+        .tab-btn {
+            flex: 1; padding: 10px; text-align: center; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: transparent; color: var(--text-secondary);
+            font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .tabs-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+
+    <!-- ═══════════ الشريط العلوي الأيمن ═══════════ -->
+    <div class="top-right-bar">
+        <button class="icon-btn" id="topThemeBtn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+        <div style="position:relative">
+            <button class="icon-btn" onclick="toggleCurrencyMenu()"><i class="fa-solid fa-coins"></i></button>
+            <div class="currency-dropdown" id="currencyMenu" style="position:absolute;top:38px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow);z-index:110;min-width:160px;display:none;overflow:hidden;backdrop-filter:blur(20px)"></div>
+        </div>
+        <button class="icon-btn" onclick="navigateTo('about')" title="حول"><i class="fa-solid fa-circle-info"></i></button>
+        <button class="icon-btn admin-btn" id="adminBtn" onclick="openAdmin()" title="لوحة الأدمن"><i class="fa-solid fa-gear"></i></button>
+    </div>
+
+    <div class="app">
+        <!-- ═══════════ الهيدر ═══════════ -->
+        <div class="header">
+            <div class="header-right">
+                <button class="icon-btn" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i></button>
+            </div>
+            <div class="header-left">
+                <div class="header-info">
+                    <span class="header-store-name" id="headerStoreName">ONE Store</span>
+                    <span class="header-contact" id="headerContact"></span>
+                </div>
+                <img class="header-logo" id="headerLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Crect fill='%236366f1' width='44' height='44' rx='12'/%3E%3Ctext x='22' y='30' text-anchor='middle' fill='white' font-size='22' font-weight='bold'%3E⚡%3C/text%3E%3C/svg%3E" alt="Logo">
+            </div>
+        </div>
+
+        <!-- ═══════════ الرئيسية ═══════════ -->
+        <div class="page active" id="page-home">
+            <div class="search-bar">
+                <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" placeholder="... ابحث عما تريد" id="mainSearch" oninput="doSearch(this.value)" style="padding-right:44px">
+            </div>
+
+            <div class="slider-container" id="imageSlider">
+                <div class="slider-track" id="sliderTrack"></div>
+                <div class="slider-dots" id="sliderDots"></div>
+            </div>
+
+            <div class="welcome-slider" id="welcomeSlider">
+                <div class="msg active">👋 أهلاً بك في ONE Store - أفضل متجر شحن</div>
+            </div>
+
+            <div class="section-title">📂 تصفح الأقسام</div>
+            <div class="categories-grid" id="categoriesGrid"></div>
+        </div>
+
+        <!-- ═══════════ الصفحات ═══════════ -->
+        <div class="page" id="page-subcategories"><div id="subContent"></div></div>
+        <div class="page" id="page-favorites"><div id="favContent"></div></div>
+        <div class="page" id="page-deposit"><div id="depositContent"></div></div>
+        <div class="page" id="page-orders"><div id="ordersContent"></div></div>
+        <div class="page" id="page-account"><div id="accountContent"></div></div>
+        <div class="page" id="page-about"><div id="aboutContent"></div></div>
+        <div class="page" id="page-search"><div id="searchContent"></div></div>
+        <div class="page" id="page-wallet"><div id="walletContent"></div></div>
+        <div class="page" id="page-auth"><div id="authContent"></div></div>
+    </div>
+
+    <!-- ═══════════ الشريط السفلي ═══════════ -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i></button>
+        <button class="nav-item" onclick="navigateTo('orders')"><i class="fa-solid fa-box-archive"></i></button>
+        <button class="nav-item" onclick="navigateTo('deposit')"><i class="fa-solid fa-wallet"></i></button>
+        <button class="nav-item" onclick="navigateTo('wallet')"><i class="fa-solid fa-sack-dollar"></i></button>
+        <button class="nav-item" onclick="navigateTo('account')"><i class="fa-solid fa-circle-user"></i></button>
+    </div>
+
+    <script>
+        // ═══════════ منع النسخ واللصق ═══════════
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('cut', e => e.preventDefault());
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
+        const admins = JSON.parse(localStorage.getItem('admins') || '[8257250965]');
+        const isAdmin = false; // الأدمن بيتحدد بعد تسجيل الدخول
+
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        let currentCurrency = localStorage.getItem('currency') || 'USD';
+        let currentSlide = 0, welcomeIndex = 0, slideInterval, welcomeInterval;
+        let currentUser = null;
+
+        // ═══════════ دوال مساعدة ═══════════
+        const gD = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+        const sD = (k, v) => { localStorage.setItem(k, JSON.stringify(v)); };
+        const fixImg = (u) => { if (!u) return ''; u = String(u).trim(); if (u.includes('ibb.co') && !u.includes('i.ibb.co')) { u = u.replace('ibb.co', 'i.ibb.co'); if (!u.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)) u += '.jpg'; } return u; };
+        const showToast = (m, t) => { const el = document.getElementById('toast'); el.textContent = m; el.className = 'toast ' + t + ' show'; clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2500); };
+        const formatPrice = (usd) => { const currencies = gD('currencies') || [{code:'USD',name:'دولار',rate:1,symbol:'$'}]; const cur = currencies.find(c => c.code === currentCurrency) || currencies[0]; const converted = parseFloat(usd) * (cur.rate || 1); if (cur.code === 'USD') return converted.toFixed(2) + ' ' + cur.symbol; return Math.round(converted).toLocaleString() + ' ' + cur.symbol; };
+        const genId = () => Math.floor(1000 + Math.random() * 9000); // آيدي 4 خانات
+        const checkAuth = () => {
+            const session = gD('session');
+            if (!session) return false;
+            if (Date.now() - session.timestamp > 432000000) { // 5 أيام
+                localStorage.removeItem('session');
+                return false;
+            }
+            currentUser = session.user;
+            return true;
+        };
+
+        // ═══════════ الثيم ═══════════
+        function applyTheme() {
+            const isLight = currentTheme === 'light';
+            document.body.classList.toggle('light-mode', isLight);
+            document.getElementById('topThemeBtn').innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            const s = gD('settings') || {};
+            if (s.primaryColor) { document.documentElement.style.setProperty('--primary', s.primaryColor); document.documentElement.style.setProperty('--primary-light', s.primaryColor + 'cc'); document.documentElement.style.setProperty('--primary-glow', s.primaryColor + '99'); }
+            if (s.bgColor) document.body.style.backgroundColor = s.bgColor;
+            if (s.bgImage) document.body.style.backgroundImage = `url(${fixImg(s.bgImage)})`;
+            const cols = s.gridCols || 2;
+            const grid = document.getElementById('categoriesGrid');
+            if (grid) grid.className = 'categories-grid' + (cols === 3 ? ' cols-3' : '');
+        }
+        function toggleTheme() { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', currentTheme); applyTheme(); }
+
+        // ═══════════ العملات ═══════════
+        function buildCurrencyMenu() {
+            const currencies = gD('currencies') || [{code:'USD',name:'دولار',rate:1,symbol:'$'}];
+            const menu = document.getElementById('currencyMenu');
+            menu.innerHTML = currencies.map(c => `<div class="currency-option" style="padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;justify-content:space-between" onclick="selectCurrency('${c.code}')"><span>${c.symbol} ${c.name}</span>${c.code!=='USD'?`<span style="font-size:11px;color:var(--text-secondary)">1$=${c.rate||0}</span>`:''}</div>`).join('');
+        }
+        function toggleCurrencyMenu() { document.getElementById('currencyMenu').style.display = document.getElementById('currencyMenu').style.display === 'block' ? 'none' : 'block'; }
+        function selectCurrency(code) { currentCurrency = code; localStorage.setItem('currency', code); document.getElementById('currencyMenu').style.display = 'none'; buildCurrencyMenu(); loadCategories(); showToast('✅ العملة: ' + code, 'success'); }
+        document.addEventListener('click', (e) => { if (!e.target.closest('.icon-btn')) document.getElementById('currencyMenu').style.display = 'none'; });
+
+        // ═══════════ السلايدر ═══════════
+        function loadSlider() {
+            const slides = gD('sliderImages') || []; if (slides.length === 0) slides.push({image:'',link:''});
+            document.getElementById('sliderTrack').innerHTML = slides.map(s => `<div class="slider-slide" onclick="${s.link?`window.open('${s.link}','_blank')`:''}"><img src="${fixImg(s.image)}" onerror="this.parentElement.innerHTML='<div style=font-size:52px>🛍️</div>'"></div>`).join('');
+            document.getElementById('sliderDots').innerHTML = slides.map((_,i) => `<button class="slider-dot ${i===0?'active':''}" onclick="goToSlide(${i})"></button>`).join('');
+        }
+        function goToSlide(i) { currentSlide = i; updateSlider(); resetSlideInterval(); }
+        function updateSlider() { document.getElementById('sliderTrack').style.transform = `translateX(-${currentSlide * 100}%)`; document.querySelectorAll('.slider-dot').forEach((d,j) => d.classList.toggle('active', j === currentSlide)); }
+        function resetSlideInterval() { clearInterval(slideInterval); const slides = gD('sliderImages') || []; if (slides.length > 1) slideInterval = setInterval(() => { currentSlide = (currentSlide + 1) % slides.length; updateSlider(); }, 3500); }
+        function loadWelcome() { const msgs = gD('welcomeMessages') || ['👋 أهلاً بك']; document.getElementById('welcomeSlider').innerHTML = msgs.map((m,i) => `<div class="msg ${i===0?'active':''}">${m}</div>`).join(''); }
+        function resetWelcomeInterval() { clearInterval(welcomeInterval); const msgs = gD('welcomeMessages') || []; if (msgs.length > 1) welcomeInterval = setInterval(() => { const all = document.querySelectorAll('#welcomeSlider .msg'); if (!all.length) return; all.forEach(m => m.classList.remove('active')); welcomeIndex = (welcomeIndex + 1) % all.length; all[welcomeIndex].classList.add('active'); }, 4500); }
+
+        // ═══════════ الأقسام ═══════════
+        function loadCategories() {
+            const cats = gD('categories') || [];
+            const grid = document.getElementById('categoriesGrid');
+            const s = gD('settings') || {};
+            grid.className = 'categories-grid' + ((s.gridCols || 2) === 3 ? ' cols-3' : '');
+            const mainCats = cats.filter(c => !c.parent_id);
+            grid.innerHTML = mainCats.map(cat => `<div class="cat-card" onclick="openCategory(${cat.id})"><img src="${fixImg(cat.image)}" onerror="this.innerHTML='<i class=\\'fa-solid fa-folder-open\\' style=font-size:36px;color:var(--primary-light)></i>'"><span class="cat-name">${cat.name}</span></div>`).join('');
+        }
+
+        function openCategory(catId) {
+            if (!checkAuth()) { navigateTo('auth'); showToast('⚠️ سجل دخول أولاً', 'error'); return; }
+            const cats = gD('categories') || []; const items = gD('items') || [];
+            const cat = cats.find(c => c.id === catId);
+            const catItems = items.filter(i => i.category_id === catId);
+            let h = `<button class="back-btn" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-right"></i> رجوع</button><h3 style="font-size:20px;font-weight:900;margin-bottom:12px">${cat ? cat.name : 'قسم'}</h3>`;
+            if (catItems.length > 0) {
+                h += catItems.map(i => `<div class="item-card" onclick="openPurchase(${i.id})">${i.image?`<img src="${fixImg(i.image)}" class="item-img">`:''}<div class="item-info"><div class="item-name">${i.name}</div>${i.description?`<div class="item-desc">${i.description}</div>`:''}</div><div class="item-price">${formatPrice(i.price||0)}</div></div>`).join('');
+            } else { h += '<p style="text-align:center;color:var(--text-secondary);margin:40px">لا توجد سلع في هذا القسم</p>'; }
+            document.getElementById('subContent').innerHTML = h;
+            navigateTo('subcategories');
+        }
+
+        function openPurchase(itemId) {
+            if (!checkAuth()) { navigateTo('auth'); return; }
+            const items = gD('items') || []; const item = items.find(i => i.id === itemId); if (!item) return;
+            document.getElementById('modalTitle').textContent = item.name;
+            document.getElementById('modalBody').innerHTML = `${item.description?`<div class="product-desc-box">${item.description}</div>`:''}${item.original_price>item.price?`<div class="original-price-box">${formatPrice(item.original_price)}</div>`:''}<div class="final-price-box">${formatPrice(item.price)}</div><div class="input-group"><label>${item.input_label||'معرف العملية'}</label><input type="text" id="purchasePlayerId" placeholder="${item.input_label||'أدخل المعرف'}"></div><div class="input-group"><label>الكمية</label><input type="number" id="purchaseQty" value="1" min="1" onchange="updateTotal(${item.price||0})"></div><p style="text-align:center;font-weight:900;font-size:19px;margin:14px 0">الإجمالي: <span id="totalPrice" style="color:var(--primary)">${formatPrice(item.price)}</span></p>${item.type==='auto'?'<div style="background:linear-gradient(135deg,var(--success),#059669);color:#fff;padding:10px;border-radius:24px;text-align:center;font-size:12px;margin:10px 0;font-weight:700"><i class="fa-solid fa-robot"></i> تلقائي 24 ساعة</div>':'<div style="text-align:center;color:var(--warning);margin:10px 0;font-weight:700"><i class="fa-solid fa-clock"></i> يدوي</div>'}<button class="btn btn-primary" onclick="confirmPurchase(${item.id})"><i class="fa-solid fa-cart-shopping"></i> شراء</button><button class="btn btn-outline" onclick="closeModal()"><i class="fa-solid fa-xmark"></i> إلغاء</button>`;
+            document.getElementById('modal').classList.add('show');
+        }
+        function updateTotal(price) { document.getElementById('totalPrice').textContent = formatPrice(price*(parseInt(document.getElementById('purchaseQty').value)||1)); }
+        function confirmPurchase(itemId) {
+            const items = gD('items') || []; const item = items.find(i => i.id === itemId); if (!item) return;
+            const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
+            const plid = document.getElementById('purchasePlayerId').value.trim();
+            if (!plid) { showToast('⚠️ أدخل '+(item.input_label||'المعرف'),'error'); return; }
+            const totalPrice = (item.price||0)*qty;
+            const bal = (currentUser?.balance||0);
+            if (bal < totalPrice) { showToast('❌ رصيد غير كافي! 💰 رصيدك: '+bal.toFixed(2)+'$ - المطلوب: '+totalPrice.toFixed(2)+'$','error'); return; }
+            currentUser.balance = bal - totalPrice;
+            updateUserData(currentUser);
+            const orders = gD('orders')||[];
+            const oid = 'ORD'+Date.now();
+            orders.unshift({id:oid,item_id:itemId,item_name:item.name,price:totalPrice,quantity:qty,player_id:plid,status:item.type==='auto'?'processing':'pending',date:new Date().toISOString(),user_id:currentUser.id,type:item.type});
+            sD('orders',orders);
+            showToast('✅ تم الطلب! رصيدك: '+currentUser.balance.toFixed(2)+'$','success');
+            closeModal();
+        }
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+        function updateUserData(u) {
+            const users = gD('users')||[];
+            const idx = users.findIndex(x=>x.id===u.id);
+            if (idx>=0) users[idx]=u; else users.push(u);
+            sD('users',users);
+            const session = gD('session');
+            if (session) { session.user = u; sD('session',session); }
+        }
+
+        // ═══════════ الإيداع ═══════════
+        function loadDeposit() {
+            if (!checkAuth()) { navigateTo('auth'); return; }
+            const methods = gD('paymentMethods')||[]; const c = document.getElementById('depositContent');
+            if (!methods.length) { c.innerHTML='<p style="text-align:center;margin:50px;color:var(--text-secondary)">لا توجد طرق دفع</p>';return; }
+            c.innerHTML=methods.map(m=>`<div class="item-card" onclick="openDeposit(${m.id})">${m.image?`<img src="${fixImg(m.image)}" class="item-img">`:''}<div class="item-info"><div class="item-name">${m.name||'طريقة دفع'}</div><div style="font-size:12px;color:var(--text-secondary)">تقديم دفعة</div></div><i class="fa-solid fa-chevron-left"></i></div>`).join('');
+        }
+        function openDeposit(mid) {
+            const methods = gD('paymentMethods')||[]; const m = methods.find(x=>x.id===mid); if(!m)return;
+            document.getElementById('modalTitle').textContent=m.name;
+            let h=''; if(m.image)h+=`<div style="text-align:center;margin-bottom:16px"><img src="${fixImg(m.image)}" style="max-width:130px;border-radius:var(--radius-md)"></div>`;
+            if(m.wallet)h+=`<div class="wallet-box">${m.wallet}</div>`;
+            if(m.instructions)h+=`<div class="instructions-box">${m.instructions}</div>`;
+            if(m.min_amount||m.max_amount)h+=`<div style="color:var(--danger);font-size:13px;text-align:center;margin:10px 0;font-weight:700">${m.min_amount?'أقل مبلغ: '+m.min_amount+'$ ':''}${m.max_amount?'أعلى مبلغ: '+m.max_amount+'$':''}</div>`;
+            h+=`<div class="input-group"><label>معرف المعاملة</label><input type="text" id="depRef"></div><div class="input-group"><label>القيمة $</label><input type="number" id="depAmt" step="0.01" oninput="document.getElementById('depVal').textContent=(parseFloat(this.value)||0).toFixed(0)"></div><p style="text-align:center;color:var(--text-secondary);font-size:13px">القيمة: <span id="depVal">0</span></p><button class="btn btn-primary" onclick="submitDeposit(${mid})"><i class="fa-solid fa-paper-plane"></i> طلب</button><button class="btn btn-outline" onclick="closeModal()">إلغاء</button>`;
+            document.getElementById('modalBody').innerHTML=h; document.getElementById('modal').classList.add('show');
+        }
+        function submitDeposit(mid) {
+            const methods=gD('paymentMethods')||[];const m=methods.find(x=>x.id===mid);
+            const ref=document.getElementById('depRef').value.trim();
+            const amt=parseFloat(document.getElementById('depAmt').value)||0;
+            if(!ref||amt<=0){showToast('⚠️ أكمل الحقول','error');return;}
+            const deposits=gD('deposits')||[];
+            deposits.push({id:'DEP'+Date.now(),user_id:currentUser.id,method:m?m.name:'',amount:amt,ref:ref,status:'pending',date:new Date().toISOString()});
+            sD('deposits',deposits);
+            showToast('✅ تم تقديم الطلب','success');closeModal();
+        }
+
+        // ═══════════ الطلبات ═══════════
+        function loadOrders(filter='all') {
+            if (!checkAuth()) { navigateTo('auth'); return; }
+            const orders = (gD('orders')||[]).filter(o=>o.user_id===currentUser.id);
+            const c = document.getElementById('ordersContent');
+            if (!orders.length) { c.innerHTML='<p style="text-align:center;margin:50px;color:var(--text-secondary)">لا توجد طلبات</p>';return; }
+            const sm={'completed':'✅ مقبول','pending':'⏳ قيد الانتظار','processing':'🔄 جاري','rejected':'❌ مرفوض'};
+            const f=filter==='all'?orders:orders.filter(o=>o.status===filter);
+            c.innerHTML=`<div class="tabs-bar">${['all','completed','pending','rejected'].map(s=>`<button class="tab-btn ${filter===s?'active':''}" onclick="loadOrders('${s}')">${s==='all'?'الكل':sm[s]||s}</button>`).join('')}</div>${f.map(o=>`<div class="item-card"><div class="item-info"><div class="item-name">${o.item_name} ${o.quantity>1?'(x'+o.quantity+')':''}</div><div style="font-size:12px;color:var(--text-secondary)">${sm[o.status]||o.status} | ${(o.price||0).toFixed(2)}$ | ${new Date(o.date).toLocaleString('ar')}</div><div style="font-size:11px;color:var(--text-secondary)">${o.player_id}</div></div></div>`).join('')}`;
+        }
+
+        // ═══════════ الحساب ═══════════
+        function loadAccount() {
+            if (!checkAuth()) { navigateTo('auth'); return; }
+            document.getElementById('accountContent').innerHTML=`<div class="item-card"><div class="item-info"><div class="item-name">🆔 آيدي الحساب</div><div style="font-weight:800">${currentUser.id}</div></div></div><div class="item-card"><div class="item-info"><div class="item-name">👤 اسم المستخدم</div><div>${currentUser.name}</div></div></div><div class="item-card"><div class="item-info"><div class="item-name">📧 البريد</div><div>${currentUser.email}</div></div></div><div class="item-card"><div class="item-info"><div class="item-name">💰 الرصيد</div><div style="font-weight:900;color:var(--primary);font-size:18px">${(currentUser.balance||0).toFixed(2)}$</div></div></div><button class="btn btn-danger" style="margin-top:20px" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج</button>`;
+        }
+
+        // ═══════════ المصادقة ═══════════
+        function showAuthForm(mode) {
+            const countries = [
+                {code:'963',name:'سوريا (+963)'},{code:'20',name:'مصر (+20)'},{code:'966',name:'السعودية (+966)'},
+                {code:'971',name:'الإمارات (+971)'},{code:'962',name:'الأردن (+962)'},{code:'961',name:'لبنان (+961)'},
+                {code:'964',name:'العراق (+964)'},{code:'965',name:'الكويت (+965)'},{code:'973',name:'البحرين (+973)'},
+                {code:'974',name:'قطر (+974)'},{code:'968',name:'عمان (+968)'},{code:'967',name:'اليمن (+967)'},
+                {code:'1',name:'أمريكا (+1)'},{code:'44',name:'بريطانيا (+44)'},{code:'49',name:'ألمانيا (+49)'},
+                {code:'90',name:'تركيا (+90)'}
+            ];
+            const countryOptions = countries.map(c => `<option value="${c.code}">${c.name}</option>`).join('');
+            
+            let h = '';
+            if (mode === 'register') {
+                h = `<h3 style="font-weight:900;margin-bottom:16px">📝 إنشاء حساب</h3>
+                <div class="warning-box">⚠️ تحذير: أي معلومة خاطئة قد تؤدي إلى حظر الحساب</div>
+                <div class="input-group"><label>👤 اسم المستخدم</label><input type="text" id="regName"></div>
+                <div class="input-group"><label>📧 البريد الإلكتروني</label><input type="email" id="regEmail"></div>
+                <div class="input-group"><label>📱 رقم الواتساب</label><div style="display:flex;gap:8px"><select id="regCountry" style="width:40%;padding:14px;border-radius:var(--radius-sm);border:2px solid var(--border);background:rgba(255,255,255,0.03);color:var(--text);font-family:inherit;font-size:14px">${countryOptions}</select><input type="tel" id="regPhone" style="width:60%" placeholder="رقم الهاتف"></div></div>
+                <div class="input-group"><label>🔒 كلمة المرور</label><input type="password" id="regPass"></div>
+                <div class="input-group"><label>🔒 تأكيد كلمة المرور</label><input type="password" id="regPassConfirm"></div>
+                <button class="btn btn-primary" onclick="register()">✅ إنشاء حساب</button>
+                <p style="text-align:center;margin-top:12px">لديك حساب؟ <a href="javascript:void(0)" onclick="showAuthForm('login')" style="color:var(--primary);font-weight:700;cursor:pointer">تسجيل دخول</a></p>`;
+            } else {
+                h = `<h3 style="font-weight:900;margin-bottom:16px">🔐 تسجيل دخول</h3>
+                <div class="input-group"><label>📧 البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
+                <div class="input-group"><label>🔒 كلمة المرور</label><input type="password" id="loginPass"></div>
+                <button class="btn btn-primary" onclick="login()">🔓 دخول</button>
+                <p style="text-align:center;margin-top:12px">ليس لديك حساب؟ <a href="javascript:void(0)" onclick="showAuthForm('register')" style="color:var(--primary);font-weight:700;cursor:pointer">إنشاء حساب</a></p>`;
+            }
+            document.getElementById('authContent').innerHTML = h;
+            navigateTo('auth');
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const country = document.getElementById('regCountry').value;
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const passConfirm = document.getElementById('regPassConfirm').value;
+            
+            if (!name || !email || !phone || !pass) { showToast('⚠️ أكمل جميع الحقول','error'); return; }
+            if (pass !== passConfirm) { showToast('❌ كلمتا المرور غير متطابقتين','error'); return; }
+            if (pass.length < 6) { showToast('❌ كلمة المرور 6 أحرف على الأقل','error'); return; }
+            
+            const users = gD('users') || [];
+            if (users.find(u => u.email === email)) { showToast('❌ البريد مستخدم مسبقاً','error'); return; }
+            
+            const newId = genId();
+            while (users.find(u => u.id === newId)) { newId = genId(); }
+            
+            const newUser = {
+                id: newId,
+                name: name,
+                email: email,
+                phone: `${country}${phone}`,
+                password: pass,
+                balance: 0,
+                vip_level: 0,
+                is_blocked: false,
+                created_at: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            sD('users', users);
+            
+            currentUser = newUser;
+            const session = { user: newUser, timestamp: Date.now() };
+            sD('session', session);
+            
+            showToast('✅ تم إنشاء الحساب! آيدي حسابك: ' + newId, 'success');
+            navigateTo('home');
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            
+            if (!email || !pass) { showToast('⚠️ أكمل جميع الحقول','error'); return; }
+            
+            const users = gD('users') || [];
+            const user = users.find(u => u.email === email && u.password === pass);
+            
+            if (!user) { showToast('❌ بريد أو كلمة مرور خاطئة','error'); return; }
+            if (user.is_blocked) { showToast('⛔ هذا الحساب محظور','error'); return; }
+            
+            currentUser = user;
+            const session = { user: user, timestamp: Date.now() };
+            sD('session', session);
+            
+            showToast('✅ أهلاً ' + user.name, 'success');
+            navigateTo('home');
+        }
+
+        function logout() {
+            localStorage.removeItem('session');
+            currentUser = null;
+            showToast('👋 تم تسجيل الخروج', 'success');
+            navigateTo('home');
+        }
+
+        // ═══════════ التنقل ═══════════
+        function navigateTo(page) {
+            if (['orders','deposit','wallet','account'].includes(page) && !checkAuth()) {
+                showAuthForm('login');
+                return;
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const t = document.getElementById('page-' + page);
+            if (t) t.classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const navMap = {home:0, orders:1, deposit:2, wallet:3, account:4};
+            if (navMap[page] !== undefined) document.querySelectorAll('.nav-item')[navMap[page]].classList.add('active');
+            window.scrollTo(0, 0);
+            if (page === 'home') { loadCategories(); resetSlideInterval(); resetWelcomeInterval(); }
+            if (page === 'deposit') loadDeposit();
+            if (page === 'orders') loadOrders();
+            if (page === 'account') loadAccount();
+            if (page === 'wallet') loadAccount();
+            if (page === 'auth') { if (checkAuth()) navigateTo('home'); }
+            if (page === 'about') {
+                const s = gD('settings') || {};
+                document.getElementById('aboutContent').innerHTML = `<h3>ℹ️ ${s.storeName||'ONE Store'}</h3><p>${s.aboutText||'متجركم الأول لشحن جميع الخدمات الإلكترونية'}</p>`;
+            }
+        }
+
+        function openAdmin() { window.location.href = 'admin.html'; }
+
+        // ═══════════ التهيئة ═══════════
+        function init() {
+            applyTheme();
+            const s = gD('settings') || {};
+            document.getElementById('headerStoreName').textContent = s.storeName || 'ONE Store';
+            if (s.logo) { const l = document.getElementById('headerLogo'); l.src = fixImg(s.logo); l.style.display = 'block'; }
+            if (s.phone || s.website) document.getElementById('headerContact').innerHTML = `${s.phone||''} ${s.website?`<a href="${s.website}" target="_blank" style="color:var(--primary-light);text-decoration:none">${s.website}</a>`:''}`;
+            // زر الأدمن يظهر فقط إذا user_id موجود بالأدمنز (بعد تسجيل الدخول)
+            const session = gD('session');
+            if (session && admins.includes(session.user?.id)) {
+                document.getElementById('adminBtn').style.display = 'flex';
+            }
+            buildCurrencyMenu(); loadSlider(); loadWelcome(); loadCategories();
+            resetSlideInterval(); resetWelcomeInterval();
+            if (checkAuth()) { /* مستخدم مسجل */ } else { /* زائر */ }
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
