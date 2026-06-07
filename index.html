@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MHD Store | ÙØªØ¬Ø± Ø§ÙØ¹ÙÙØ§Øª ÙØ§ÙØ®Ø¯ÙØ§Øª</title>
+    <style>
+        :root {
+            --bg: #050914;
+            --surface: #0b1220;
+            --card: #0f172a;
+            --card-soft: #020617;
+            --text: #ffffff;
+            --muted: #9aa4b2;
+            --accent: #cc0000;
+            --accent-glow: rgba(204, 0, 0, 0.4);
+            --border: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --surface-rgb: 11, 18, 32;
+            --purple: #9b59b6;
+            --purple-glow: rgba(155, 89, 182, 0.4);
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        [data-theme="light"] {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --card: #ffffff;
+            --card-soft: #eef2f7;
+            --text: #0b1220;
+            --muted: #4b5563;
+            --accent: #cc0000;
+            --accent-glow: rgba(204, 0, 0, 0.3);
+            --border: #dbe3ef;
+            --surface-rgb: 255, 255, 255;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: hidden;
+            padding-bottom: 65px;
+        }
+
+        .logo, .hero-title, .section-title {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+
+        /* ===== Notifications Bell ===== */
+        .notif-bell {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--card-soft);
+            border: 1px solid var(--border);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            position: relative;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            min-width: 14px;
+            height: 14px;
+            border-radius: 20px;
+            background: var(--accent);
+            color: white;
+            font-size: 8px;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        .notif-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 16px;
+        }
+        .notif-modal.show { display: flex; }
+        .notif-box {
+            width: 100%;
+            max-width: 390px;
+            max-height: 75vh;
+            overflow-y: auto;
+            background: linear-gradient(145deg, var(--card), var(--card-soft));
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 0 35px var(--accent-glow);
+        }
+        .notif-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .notif-head h3 {
+            color: var(--accent);
+            font-size: 15px;
+        }
+        .notif-close {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 4px 9px;
+            cursor: pointer;
+        }
+        .notif-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-right: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 11px;
+            margin-bottom: 9px;
+        }
+        .notif-item.read { opacity: 0.65; }
+        .notif-item.success { border-right-color: var(--success); }
+        .notif-item.warning { border-right-color: var(--warning); }
+        .notif-item.danger { border-right-color: var(--danger); }
+        .notif-title {
+            font-weight: 800;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .notif-msg {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .notif-date {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* Ø´Ø±ÙØ· Ø¹ÙÙÙ ÙØµØºØ± */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(12px);
+            background: rgba(var(--surface-rgb), 0.85);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(204, 0, 0, 0.08);
+        }
+
+        .topbar-inner {
+            max-width: 1400px;
+            margin: auto;
+            padding: 7px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            height: 56px;
+        }
+
+        .left-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .menu-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--card-soft);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .menu-btn span {
+            width: 18px;
+            height: 2px;
+            background: var(--accent);
+            display: block;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 6px var(--accent);
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .user-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .balance {
+            background: var(--card-soft);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            border-radius: 14px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            white-space: nowrap;
+            height: 30px;
+        }
+
+        .balance i {
+            font-size: 8px;
+        }
+
+        .add-balance {
+            background: var(--accent);
+            border: none;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 2px;
+            transition: 0.2s;
+            color: white;
+            font-size: 8px;
+            flex-shrink: 0;
+        }
+
+        .add-balance:active {
+            transform: scale(0.9);
+        }
+
+        .username {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 9px;
+            padding: 2px 7px;
+            background: var(--card-soft);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            height: 22px;
+        }
+
+        /* ÙØ³ØªÙÙ VIP Ø¬ÙØ¨ Ø§ÙØ§Ø³Ù */
+        .vip-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            padding: 1px 5px;
+            border-radius: 14px;
+            font-size: 7px;
+            font-weight: 800;
+            color: #1a1a2e;
+            box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+            margin-right: 3px;
+            cursor: pointer;
+            height: 14px;
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(204, 0, 0, 0.2);
+            border: 1px solid var(--accent);
+            border-radius: 14px;
+            padding: 1px 5px;
+            font-size: 7px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-right: 3px;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            height: 14px;
+        }
+
+        .level-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--accent);
+            background: var(--card-soft);
+            box-shadow: 0 0 3px var(--accent-glow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+        }
+
+        .level-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* Ø²Ø± ØªØ¨Ø¯ÙÙ Ø§ÙØ¹ÙÙØ© ÙÙ Ø§ÙØ´Ø±ÙØ· Ø§ÙØ¹ÙÙÙ */
+        .currency-switch-top {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: var(--card-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1px 5px;
+            cursor: pointer;
+            font-size: 8px;
+            font-weight: 700;
+            height: 22px;
+        }
+
+        .currency-switch-top .switch-track {
+            width: 24px;
+            height: 12px;
+            background: var(--border);
+            border-radius: 14px;
+            position: relative;
+        }
+
+        .currency-switch-top .switch-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            transition: 0.2s;
+        }
+
+
+        .drawer-currency-switch {
+            background: rgba(204, 0, 0, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .drawer-currency-switch .switch-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .drawer-currency-switch i { color: var(--accent); font-size: 16px; }
+        .drawer-switch-track {
+            width: 46px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 30px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .drawer-switch-dot {
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            transition: 0.2s;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+        .drawer-currency-value {
+            color: var(--accent);
+            font-family: 'Orbitron', monospace;
+            font-size: 11px;
+            font-weight: 800;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        /* Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ¬Ø§ÙØ¨ÙØ© */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 16px 12px;
+            transition: 0.3s ease;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-user {
+            background: linear-gradient(145deg, var(--card), var(--card-soft));
+            border-radius: 14px;
+            padding: 14px 12px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.05);
+        }
+
+        .drawer-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #990000);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            border: 2px solid var(--border);
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.2);
+        }
+
+        .drawer-user-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .drawer-vip {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            padding: 2px 7px;
+            border-radius: 14px;
+            font-size: 9px;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .drawer-level {
+            background: rgba(204, 0, 0, 0.2);
+            border: 1px solid var(--accent);
+            padding: 2px 7px;
+            border-radius: 14px;
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+
+        .drawer-user-email {
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        /* ØµÙØ¯ÙÙ Ø³Ø¹Ø± Ø§ÙØµØ±Ù ÙÙ Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ¬Ø§ÙØ¨ÙØ© */
+        .drawer-exchange-box {
+            background: rgba(204, 0, 0, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .drawer-exchange-box i {
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .drawer-exchange-box .exch-text {
+            color: var(--muted);
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .drawer-exchange-box .exch-value {
+            color: var(--accent);
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .drawer-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            transition: 0.15s;
+        }
+
+        .drawer-menu-item i {
+            width: 18px;
+            color: var(--accent);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .drawer-menu-item:active {
+            background: var(--card-soft);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(204, 0, 0, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(204, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+        .logout-btn:active { transform: scale(0.97); }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            z-index: 90;
+        }
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 6px 10px 20px;
+        }
+
+        /* ===== Ø§ÙØ¯Ø§Ø¦Ø±Ø© Ø§ÙØ·Ø§ÙÙØ© Ø§ÙØ¨ÙÙØ³Ø¬ÙØ© (FAB) ===== */
+        .floating-purple {
+            position: fixed;
+            bottom: 58px;
+            left: 15px;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(145deg, #9b59b6, #8e44ad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.5);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .fab-main i {
+            font-size: 28px;
+            color: white;
+            transition: 0.2s;
+        }
+        .fab-main:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 10px rgba(155, 89, 182, 0.6);
+        }
+
+        .fab-options {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(18px);
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            pointer-events: none;
+        }
+        .fab-options.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-6px);
+            pointer-events: auto;
+        }
+        .fab-option {
+            width: 45px;
+            height: 45px;
+            background: rgba(155, 89, 182, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: 0.15s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .fab-option i {
+            font-size: 22px;
+            color: white;
+        }
+        .fab-option:active {
+            transform: scale(0.9);
+        }
+        .fab-option.whatsapp-channel i { color: #25D366; }
+        .fab-option.whatsapp-support i { color: #075E54; }
+
+        /* Ø³ÙØ§ÙØ¯Ø± */
+        .hero-slider {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 130px;
+        }
+
+        .slider-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            z-index: 4;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .dot.active {
+            background: var(--accent);
+            width: 16px;
+            border-radius: 10px;
+        }
+
+        /* Ø´Ø±ÙØ· Ø£Ø®Ø¨Ø§Ø± */
+        .ticker {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            padding: 0 10px;
+        }
+
+        .ticker-track {
+            white-space: nowrap;
+            display: inline-block;
+            padding: 5px 0;
+            animation: tickerMove 20s linear infinite;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 9px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes tickerMove {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent);
+            padding-right: 8px;
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 60%;
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .view-all {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .card {
+            background: linear-gradient(145deg, var(--card), var(--card-soft));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .card:active {
+            transform: scale(0.96);
+        }
+
+        .card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== GLASS PULSE LOADER (NEW) ========== */
+        .sphere-loader {
+            grid-column: 1/-1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 20px;
+            min-height: 260px;
+        }
+        .loader {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff4d4d, #660000);
+            box-shadow: 0 0 30px rgba(204, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: premiumPulse 1.6s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            transition: all 0.2s ease;
+        }
+        @keyframes premiumPulse {
+            0% { transform: scale(0.85); opacity: 0.7; box-shadow: 0 0 20px rgba(204,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.2); }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 45px rgba(204,0,0,0.9), inset 0 0 30px rgba(255,255,255,0.5); background: radial-gradient(circle at 30% 30%, #ff6666, #990000); }
+            100% { transform: scale(0.85); opacity: 0.7; box-shadow: 0 0 20px rgba(204,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.2); }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(var(--surface-rgb), 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            padding: 6px 12px;
+            z-index: 50;
+            box-shadow: 0 -4px 20px rgba(204, 0, 0, 0.15);
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 9px;
+            transition: 0.2s;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            text-shadow: 0 0 8px var(--accent);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+            color: var(--accent);
+        }
+
+        /* ØªØ°ÙÙÙ Ø§ÙÙØ¨Ø±ÙØ¬ */
+        .mkdad-credit {
+            text-align: center;
+            font-size: 9px;
+            color: var(--muted);
+            margin-top: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .mkdad-credit a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .telegram-contact {
+            background: rgba(204, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 3px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+
+        /* ===== Channels Welcome Modal ===== */
+        .channels-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+        .channels-modal.show { display: flex; }
+        .channels-box {
+            width: 100%;
+            max-width: 360px;
+            background: linear-gradient(145deg, var(--card), var(--card-soft));
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 0 35px var(--accent-glow);
+        }
+        .channels-box h3 {
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .channels-box p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+        .channels-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .channel-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+        }
+        .channel-btn.telegram { background: #229ED9; }
+        .channel-btn.whatsapp { background: #25D366; }
+        .close-channels-btn {
+            margin-top: 12px;
+            width: 100%;
+            padding: 9px;
+            border-radius: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .slider-container { height: 120px; }
+            .grid { gap: 6px; }
+            .card { padding: 6px 4px; }
+            .card-title { font-size: 9px; }
+            .fab-main { width: 48px; height: 48px; }
+            .fab-main i { font-size: 24px; }
+            .fab-option { width: 40px; height: 40px; }
+            .fab-option i { font-size: 18px; }
+            .loader { width: 55px; height: 55px; }
+            .sphere-loader { padding: 30px 20px; min-height: 200px; }
+            .topbar-inner { padding: 7px 12px; height: 56px; }
+            .logo { font-size: 14px; }
+            .balance { height: 30px; font-size: 10px; padding: 3px 9px; }
+            .notif-bell { width: 36px; height: 36px; font-size: 13px; }
+            .menu-btn { width: 34px; height: 34px; border-radius: 8px; }
+            .menu-btn span { width: 18px; height: 2px; }
+        }
+        @media (min-width: 768px) {
+            .slider-container { height: 180px; }
+            .loader { width: 85px; height: 85px; }
+        }
+    
+        /* VIP_PROGRESS_START */
+        .vip-progress-card {
+            margin-top: 9px;
+            padding: 9px 10px;
+            border-radius: 13px;
+            background: linear-gradient(180deg, rgba(16,185,129,.13), rgba(16,185,129,.05));
+            border: 1px solid rgba(16,185,129,.28);
+            box-shadow: 0 5px 14px rgba(16,185,129,.08);
+            display: none;
+        }
+
+        .vip-progress-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 7px;
+            margin-bottom: 6px;
+            direction: ltr;
+        }
+
+        .vip-progress-pill {
+            min-width: 32px;
+            text-align: center;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #10b981;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            box-shadow: 0 0 9px rgba(16,185,129,.35);
+        }
+
+        .vip-progress-percent {
+            color: #10b981;
+            font-size: 10px;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .vip-progress-track {
+            width: 100%;
+            height: 7px;
+            background: rgba(16,185,129,.18);
+            border-radius: 999px;
+            overflow: hidden;
+            direction: ltr;
+        }
+
+        .vip-progress-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #22c55e, #10b981, #34d399);
+            box-shadow: 0 0 10px rgba(16,185,129,.55);
+            transition: width .4s ease;
+        }
+
+        .vip-progress-info {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 9px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .vip-progress-info b {
+            color: var(--text);
+        }
+        
+        .vip-progress-page-wrap {
+            max-width: 1400px;
+            margin: 8px auto 8px;
+            padding: 0 10px;
+        }
+
+        .vip-progress-page-wrap .vip-progress-card {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* VIP_PROGRESS_END */
+
+</style>
+  <script src="/js/maintenance-check.js"></script>
+<link rel="icon" type="image/png" href="/favicon.png?v=20260531191812">
+<link rel="shortcut icon" type="image/png" href="/favicon.png?v=20260531191812">
+<link rel="apple-touch-icon" href="/images/logo.png?v=20260531190433">
+</head>
+<body>
+
+
+<!-- ===== Notifications Modal ===== -->
+<div id="notifModal" class="notif-modal">
+    <div class="notif-box">
+        <div class="notif-head">
+            <h3><i class="fas fa-bell"></i> Ø§ÙØ¥Ø´Ø¹Ø§Ø±Ø§Øª</h3>
+            <button class="notif-close" onclick="closeNotifications()">Ø¥ØºÙØ§Ù</button>
+        </div>
+        <div id="notifList"></div>
+    </div>
+</div>
+
+
+
+<!-- ===== Channels Welcome Modal ===== -->
+<div id="channelsModal" class="channels-modal">
+    <div class="channels-box">
+        <h3><i class="fas fa-bullhorn"></i> ØªØ§Ø¨Ø¹ ÙÙÙØ§ØªÙØ§</h3>
+        <p>Ø§ÙØ¶Ù ÙÙÙÙØ§ØªÙØ§ ÙÙØµÙÙ ÙÙ Ø¬Ø¯ÙØ¯ Ø§ÙØ¹Ø±ÙØ¶ ÙØ§ÙØªØ­Ø¯ÙØ«Ø§Øª ÙØ§ÙØ¯Ø¹Ù.</p>
+
+        <div class="channels-actions">
+            <a href="https://t.me/Syrian_Game_Card_bot" target="_blank" class="channel-btn telegram">
+                <i class="fab fa-telegram"></i> ÙÙØ§Ø© Ø§ÙØªÙÙÙØ¬Ø±Ø§Ù
+            </a>
+
+            <a href="https://whatsapp.com/channel/0029VbC6vvQ5kg78qdmHAx1b" target="_blank" class="channel-btn whatsapp">
+                <i class="fab fa-whatsapp"></i> ÙÙØ§Ø© Ø§ÙÙØ§ØªØ³Ø§Ø¨
+            </a>
+        </div>
+
+        <button class="close-channels-btn" onclick="closeChannelsModal()">
+            Ø¥ØºÙØ§Ù
+        </button>
+    </div>
+</div>
+
+
+<!-- ===== VIP MODAL ===== -->
+<div id="vipModal" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+">
+    <div style="
+        background: var(--card);
+        padding: 20px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 350px;
+        border: 1px solid var(--border);
+        box-shadow: 0 0 30px var(--accent-glow);
+    ">
+        <h3 style="color: var(--accent); margin-bottom: 15px;">
+            <i class="fas fa-crown"></i> ÙØ¸Ø§Ù Ø§ÙÙØ³ØªÙÙØ§Øª
+        </h3>
+
+        <div id="vipLevelsBox" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+        <button onclick="closeVipModal()" style="
+            margin-top:15px;
+            width:100%;
+            padding:8px;
+            border-radius:10px;
+            background:transparent;
+            border:1px solid var(--border);
+            color:var(--text);
+        ">
+            Ø¥ØºÙØ§Ù
+        </button>
+    </div>
+</div>
+
+<div id="drawer" class="drawer">
+    <div id="drawerUserSection" class="drawer-user">
+        <div class="drawer-avatar" id="drawerAvatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div id="drawerUserName" class="drawer-user-name">Ø²Ø§Ø¦Ø±</div>
+        <div id="drawerUserEmail" class="drawer-user-email">guest@mhdstore.com</div>
+<div id="drawerAuthButtons" style="display:flex; flex-direction:column; gap:6px;">
+            <button onclick="redirectToLogin(event)" style="width:100%; padding:7px; border-radius:10px; background:linear-gradient(135deg, var(--accent), #990000); color:white; font-weight:700; font-size:12px; text-align:center; border:none; cursor:pointer;"><i class="fas fa-sign-in-alt"></i> Ø¯Ø®ÙÙ</button>
+            <button onclick="redirectToRegister(event)" style="width:100%; padding:7px; border-radius:10px; background:transparent; color:var(--text); font-size:12px; border:1px solid var(--border); cursor:pointer;"><i class="fas fa-user-plus"></i> Ø­Ø³Ø§Ø¨ Ø¬Ø¯ÙØ¯</button>
+        </div>
+        <div id="logoutBox" style="display:none; margin-top:10px;">
+            <button onclick="logoutUser(event)" class="logout-btn"><i class="fas fa-sign-out-alt"></i> ØªØ³Ø¬ÙÙ Ø®Ø±ÙØ¬</button>
+        </div>
+    </div>
+
+    <!-- ===== Ø³Ø¹Ø± Ø§ÙØµØ±Ù ÙÙ Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ¬Ø§ÙØ¨ÙØ© ===== -->
+    <div class="drawer-exchange-box" id="drawerExchangeBox">
+        <i class="fas fa-exchange-alt"></i>
+        <span class="exch-text">Ø³Ø¹Ø± Ø§ÙØµØ±Ù</span>
+        <span class="exch-value">
+            1$ = <span id="drawerExchangeRateText">0</span> Ù.Ø³
+        </span>
+    </div>
+
+    <div class="drawer-currency-switch" id="drawerCurrencySwitchBox" onclick="toggleCurrency()">
+        <div class="switch-label">
+            <i class="fas fa-coins"></i>
+            <span>ØªØ­ÙÙÙ Ø§ÙØ¹ÙÙØ©</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span id="drawerCurrencyText" class="drawer-currency-value">USD</span>
+            <div class="drawer-switch-track">
+                <div id="drawerSwitchDot" class="drawer-switch-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div style="font-size:9px; color:var(--muted); margin-bottom:6px; padding-right: 4px;">Ø±Ø¦ÙØ³Ù</div>
+        <a href="/store.html" class="drawer-menu-item"><i class="fas fa-home"></i> Ø§ÙØ±Ø¦ÙØ³ÙØ©</a>
+        <a href="/store.html" class="drawer-menu-item"><i class="fas fa-th-large"></i> Ø§ÙØªØµÙÙÙØ§Øª</a>
+        <a href="/orders.html" class="drawer-menu-item"><i class="fas fa-shopping-bag"></i> Ø·ÙØ¨Ø§ØªÙ</a>
+        <a href="/wallet.html" class="drawer-menu-item"><i class="fas fa-wallet"></i> Ø§ÙÙØ­ÙØ¸Ø©</a>
+        <a href="https://mhd-game.com/deposit.html" class="drawer-menu-item"><i class="fas fa-credit-card"></i> Ø¥ÙØ¯Ø§Ø¹</a>
+    </div>
+    <div style="margin-top: 14px;">
+        <div style="font-size:9px; color:var(--muted); margin-bottom:6px; padding-right: 4px;">ÙØ¹ÙÙÙØ§Øª</div>
+        <a href="#" onclick="showAboutUs(); return false;" class="drawer-menu-item"><i class="fas fa-info-circle"></i> ÙÙ ÙØ­Ù</a>
+        <a href="#" onclick="showTerms(); return false;" class="drawer-menu-item"><i class="fas fa-file-contract"></i> Ø§ÙØ´Ø±ÙØ·</a>
+        <a href="https://t.me/Samer_Support" target="_blank" class="drawer-menu-item"><i class="fab fa-telegram"></i> Ø§ÙØ¯Ø¹Ù (ØªÙÙÙØ¬Ø±Ø§Ù)</a>
+    </div>
+
+    <!-- ===== ÙØ§Ø¦ÙØ© API Ø§ÙÙØ­Ø¯Ø«Ø© ===== -->
+    <div id="apiMenuItem" style="display:none;">
+        <div style="font-size:9px; color:var(--muted); margin-bottom:6px; padding-right: 4px;">API</div>
+        <a href="/user-api.html" class="drawer-menu-item">
+            <i class="fas fa-key"></i> Ø¥Ø¯Ø§Ø±Ø© API
+        </a>
+        <a href="/api-docs.html" class="drawer-menu-item">
+            <i class="fas fa-book"></i> ØªÙØ«ÙÙ API
+        </a>
+    </div>
+
+    <div style="margin-top: 14px;">
+        <div style="display:flex; gap:8px; justify-content:center;">
+            <button onclick="toggleTheme()" style="flex:1; padding:7px; border-radius:10px; background:var(--card-soft); border:1px solid var(--border); color:var(--text); font-size:11px;"><i class="fas fa-moon"></i> Ø«ÙÙ</button>
+            <button onclick="toggleLang()" style="flex:1; padding:7px; border-radius:10px; background:var(--card-soft); border:1px solid var(--border); color:var(--text); font-size:11px;"><i class="fas fa-language"></i> EN</button>
+        </div>
+    </div>
+    <div class="mkdad-credit">
+        <div><i class="fas fa-code"></i> ØªÙ Ø§ÙØ¨Ø±ÙØ¬Ø© Ø¨ÙØ§Ø³Ø·Ø© mkdad tec</div>
+        <a href="https://t.me/mkdad_tec" target="_blank" class="telegram-contact">
+            <i class="fab fa-telegram"></i> @mkdad_tec
+        </a>
+    </div>
+</div>
+
+<div id="overlay" class="overlay" onclick="toggleDrawer(false)"></div>
+
+<!-- Ø§ÙØ¯Ø§Ø¦Ø±Ø© Ø§ÙØ·Ø§ÙÙØ© Ø§ÙØ¨ÙÙØ³Ø¬ÙØ© -->
+<div class="floating-purple">
+    <div class="fab-main" id="fabMainBtn">
+        <i class="fas fa-headset"></i>
+    </div>
+    <div class="fab-options" id="fabOptions">
+        <a href="https://whatsapp.com/channel/0029VbC6vvQ5kg78qdmHAx1b" target="_blank" class="fab-option whatsapp-channel" title="ÙÙØ§Ø© Ø§ÙÙØ§ØªØ³Ø§Ø¨">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://wa.me/963985468036" target="_blank" class="fab-option whatsapp-support" title="Ø§ÙØ¯Ø¹Ù Ø§ÙÙØ¨Ø§Ø´Ø±">
+            <i class="fas fa-comment-dots"></i>
+        </a>
+    </div>
+</div>
+
+<!-- ===== API PANEL (POPUP) ===== -->
+<div id="apiPanel" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+">
+    <div style="
+        background: var(--card);
+        padding: 20px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 400px;
+        border: 1px solid var(--border);
+        box-shadow: 0 0 30px rgba(204,0,0,0.3);
+    ">
+        <h3 style="margin-bottom:10px; color: var(--accent);"><i class="fas fa-code"></i> API Access</h3>
+
+        <div style="font-size:11px; color:var(--muted); margin-top:10px;">ð API KEY</div>
+        <div id="apiKeyBox" style="
+            background: var(--card-soft);
+            padding: 10px;
+            border-radius: 8px;
+            word-break: break-all;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 10px;
+            border: 1px solid var(--border);
+        "></div>
+
+        <div style="font-size:11px; color:var(--muted);">ð Allowed IPs (Ø§ÙØµÙ Ø¨ÙÙÙØ§ Ø¨ÙØ§ØµÙØ©)</div>
+        <input id="apiIpsInput" placeholder="127.0.0.1, 192.168.1.1"
+            style="
+            width:100%;
+            padding:8px;
+            border-radius:8px;
+            margin-top:5px;
+            border:1px solid var(--border);
+            background: var(--card-soft);
+            color: var(--text);
+        ">
+
+        <button onclick="saveApiIps()" style="
+            margin-top:15px;
+            width:100%;
+            padding:8px;
+            background: var(--accent);
+            border:none;
+            border-radius:8px;
+            color:white;
+            font-weight:bold;
+            cursor: pointer;
+        ">
+            <i class="fas fa-save"></i> Ø­ÙØ¸
+        </button>
+
+        <button onclick="closeApiPanel()" style="
+            margin-top:8px;
+            width:100%;
+            padding:6px;
+            background:transparent;
+            border:1px solid var(--border);
+            border-radius:8px;
+            color:var(--text);
+            cursor: pointer;
+        ">
+            Ø¥ØºÙØ§Ù
+        </button>
+    </div>
+</div>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="left-group">
+            <div class="menu-btn" onclick="toggleDrawer(true)">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="logo">MHD Store</div>
+        </div>
+        <div class="user-box">
+
+            <div id="notifBell" class="notif-bell" onclick="openNotifications()">
+                <i class="fas fa-bell"></i>
+                <span id="notifBadge" class="notif-badge">0</span>
+            </div>
+
+            <div id="balanceBox" class="balance">
+                <i class="fas fa-coins"></i> $0.00
+                <span class="add-balance" onclick="addBalance()">+</span>
+            </div>
+
+
+        </div>
+    </div>
+
+<!-- VIP_PROGRESS_HTML_START -->
+<div class="vip-progress-page-wrap">
+    <div id="vipProgressCard" class="vip-progress-card">
+        <div class="vip-progress-row">
+            <span class="vip-progress-pill" id="vipProgressCurrent">V1</span>
+            <span class="vip-progress-percent" id="vipProgressPercent">0%</span>
+            <span class="vip-progress-pill" id="vipProgressNext">V2</span>
+        </div>
+        <div class="vip-progress-track">
+            <div id="vipProgressFill" class="vip-progress-fill"></div>
+        </div>
+        <div id="vipProgressInfo" class="vip-progress-info">Ø¬Ø§Ø±Ù Ø­Ø³Ø§Ø¨ ØªÙØ¯Ù Ø§ÙÙØ³ØªÙÙ...</div>
+    </div>
+</div>
+<!-- VIP_PROGRESS_HTML_END -->
+
+</div>
+
+<div class="container">
+    <div class="hero-slider">
+        <div class="slider-container">
+            <div class="slider-track" id="sliderTrack"></div>
+            <div class="slider-dots" id="sliderDots"></div>
+        </div>
+    </div>
+
+    <div class="ticker">
+        <div class="ticker-track" id="tickerText">
+            <i class="fas fa-star"></i> Ø£ÙØ¶Ù Ø§ÙØ£Ø³Ø¹Ø§Ø± â¢ Ø´Ø­Ù ÙÙØ±Ù â¢ Ø¯Ø¹Ù 24/7 â¢ Ø®ØµÙÙØ§Øª Ø­ØµØ±ÙØ©
+        </div>
+    </div>
+
+    <div class="section-header">
+        <div class="section-title" id="catTitle">Ø¬ÙÙØ¹ Ø§ÙØªØµÙÙÙØ§Øª</div>
+        <a href="/store.html" class="view-all">
+            Ø§ÙÙÙ <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+    <div id="categories" class="grid">
+        <div class="sphere-loader" id="loaderContainer">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-items">
+        <a href="/store.html" class="nav-item active" id="navHome">
+            <i class="fas fa-home"></i>
+            <span>Ø§ÙØ±Ø¦ÙØ³ÙØ©</span>
+        </a>
+        <a href="https://mhd-game.com/deposit.html" class="nav-item" id="navDeposit">
+            <i class="fas fa-credit-card"></i>
+            <span>Ø¥ÙØ¯Ø§Ø¹</span>
+        </a>
+        <a href="/wallet.html" class="nav-item" id="navWallet">
+            <i class="fas fa-wallet"></i>
+            <span>Ø§ÙÙØ­ÙØ¸Ø©</span>
+        </a>
+        <a href="/orders.html" class="nav-item" id="navOrders">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Ø·ÙØ¨Ø§ØªÙ</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const API = "https://mhd-game.com/api";
+        const TOKEN = localStorage.getItem("token");
+        let EXCHANGE_RATE = 1;
+
+        let CURRENT_CURRENCY = localStorage.getItem("currency") || "USD";
+        let banners = [];
+        let currentIndex = 0;
+        let autoPlayInterval = null;
+
+        window.USER_API_KEY = null;
+        window.USER_API_IPS = [];
+
+        window.toggleDrawer = function(open) {
+            document.getElementById("drawer").classList.toggle("open", open);
+            document.getElementById("overlay").classList.toggle("show", open);
+            if (open) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = '';
+        }
+
+        window.addBalance = function() {
+            window.location.href = "/wallet.html";
+        }
+
+        window.redirectToLogin = function(event) {
+            if (event) event.stopPropagation();
+            toggleDrawer(false);
+            setTimeout(() => { window.location.href = "/login.html"; }, 150);
+        }
+        window.redirectToRegister = function(event) {
+            if (event) event.stopPropagation();
+            toggleDrawer(false);
+            setTimeout(() => { window.location.href = "/register.html"; }, 150);
+        }
+
+        window.logoutUser = function(event) {
+            if (event) event.stopPropagation();
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            localStorage.removeItem("balance");
+            toggleDrawer(false);
+            setTimeout(() => { window.location.href = "/store.html"; }, 150);
+        }
+
+        window.showAboutUs = function() {
+            alert("ð ÙØªØ¬Ø± MHD STORE ð\n\nÙØªØ¬Ø± ÙØªÙØ§ÙÙ ÙØ¨ÙØ¹ Ø§ÙØ¹ÙÙØ§Øª Ø§ÙØ±ÙÙÙØ©Ø Ø­Ø³Ø§Ø¨Ø§Øª Ø§ÙØ£ÙØ¹Ø§Ø¨Ø Ø¨Ø·Ø§ÙØ§Øª Ø§ÙØ´Ø­ÙØ ÙØ®Ø¯ÙØ§Øª Ø§ÙØ§Ø´ØªØ±Ø§ÙØ§Øª.\nÙÙÙØ± ÙÙ Ø£ÙØ¶Ù Ø§ÙØ£Ø³Ø¹Ø§Ø±Ø Ø´Ø­Ù ÙÙØ±ÙØ Ø¯Ø¹Ù Ø¹ÙÙ ÙØ¯Ø§Ø± Ø§ÙØ³Ø§Ø¹Ø©.\n\nØªØ£Ø³Ø³ ÙØªØ¬Ø±ÙØ§ ÙÙÙÙÙ ÙØ¬ÙØªÙ Ø§ÙØ£ÙÙÙ ÙÙÙ Ø¹Ø´Ø§Ù Ø§ÙØ£ÙØ¹Ø§Ø¨ ÙØ§ÙØªØ·Ø¨ÙÙØ§Øª.\n\nÙØ¶ÙÙ ÙÙ ØªØ¬Ø±Ø¨Ø© Ø´Ø±Ø§Ø¡ Ø¢ÙÙØ© ÙØ³Ø±ÙØ¹Ø© Ø¨ÙØ¶Ù ØªÙÙÙØ§ØªÙØ§ Ø§ÙÙØªØ·ÙØ±Ø© ÙÙØ±ÙÙ Ø§ÙØ¯Ø¹Ù Ø§ÙÙØ­ØªØ±Ù.\n\nØ´ÙØ±Ø§Ù ÙØ«ÙØªÙ Ø¨Ù MHD STORE!");
+        };
+
+        window.showTerms = function() {
+            alert("ð Ø´Ø±ÙØ· ÙØ£Ø­ÙØ§Ù ÙØªØ¬Ø± MHD STORE ð\n\n1. Ø¬ÙÙØ¹ Ø§ÙÙÙØªØ¬Ø§Øª Ø±ÙÙÙØ© ÙÙØªÙ ØªØ³ÙÙÙÙØ§ ÙÙØ±ÙØ§Ù Ø¨Ø¹Ø¯ Ø§ÙØ¯ÙØ¹.\n2. ØªØ£ÙØ¯ ÙÙ ØµØ­Ø© Ø¨ÙØ§ÙØ§ØªÙ ÙØ¨Ù Ø¥ØªÙØ§Ù Ø§ÙØ·ÙØ¨.\n3. ÙÙ Ø­Ø§Ù ÙØ¬ÙØ¯ ÙØ´ÙÙØ© ÙÙ Ø§ÙÙÙØªØ¬Ø ÙØ±Ø¬Ù Ø§ÙØªÙØ§ØµÙ ÙØ¹ Ø§ÙØ¯Ø¹Ù Ø®ÙØ§Ù 24 Ø³Ø§Ø¹Ø©.\n4. ÙØ§ ÙØ³ØªØ±Ø¯ Ø§ÙÙØ¨Ø§ÙØº Ø¨Ø¹Ø¯ ØªØ³ÙÙÙ Ø§ÙÙÙØªØ¬ Ø¥ÙØ§ ÙÙ Ø­Ø§Ù Ø«Ø¨ÙØª Ø®ÙÙ ØªÙÙÙ.\n5. Ø§ÙØ£Ø³Ø¹Ø§Ø± ÙØ§Ø¨ÙØ© ÙÙØªØºÙÙØ± Ø­Ø³Ø¨ Ø§ÙØ¹Ø±ÙØ¶.\n6. Ø§Ø³ØªØ®Ø¯Ø§Ù Ø§ÙÙØªØ¬Ø± ÙØ¹ÙÙ Ø§ÙÙÙØ§ÙÙØ© Ø¹ÙÙ Ø¬ÙÙØ¹ Ø§ÙØ´Ø±ÙØ·.\n\nÙÙØ§Ø³ØªÙØ³Ø§Ø±: @Samer_Support Ø¹ÙÙ ØªÙÙÙØ¬Ø±Ø§Ù.");
+        };
+
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", html.dataset.theme);
+        }
+
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+        let LANG = localStorage.getItem("lang") || "ar";
+        const I18N = {
+            ar: { categories: "Ø¬ÙÙØ¹ Ø§ÙØªØµÙÙÙØ§Øª", ticker: "â­ Ø£ÙØ¶Ù Ø§ÙØ£Ø³Ø¹Ø§Ø± â¢ Ø´Ø­Ù ÙÙØ±Ù â¢ Ø¯Ø¹Ù 24/7 â¢ Ø®ØµÙÙØ§Øª Ø­ØµØ±ÙØ©", langBtn: "EN" },
+            en: { categories: "All Categories", ticker: "â­ Best prices â¢ Instant delivery â¢ 24/7 support â¢ Exclusive deals", langBtn: "AR" }
+        };
+
+        function applyLang() {
+            const t = I18N[LANG];
+            document.documentElement.lang = LANG;
+            document.documentElement.dir = LANG === "ar" ? "rtl" : "ltr";
+            document.getElementById("catTitle").innerText = t.categories;
+            document.getElementById("tickerText").innerHTML = `<i class="fas fa-star"></i> ${t.ticker}`;
+        }
+
+        window.toggleLang = function() {
+            LANG = LANG === "ar" ? "en" : "ar";
+            localStorage.setItem("lang", LANG);
+            applyLang();
+        }
+        applyLang();
+
+        window.toggleCurrency = function() {
+            CURRENT_CURRENCY = CURRENT_CURRENCY === "USD" ? "SYP" : "USD";
+            localStorage.setItem("currency", CURRENT_CURRENCY);
+            updateCurrencyUI();
+            loadBalance();
+        }
+
+        function updateCurrencyUI() {
+            const currencyText = document.getElementById("drawerCurrencyText");
+            const drawerDot = document.getElementById("drawerSwitchDot");
+
+            if (currencyText) currencyText.innerText = CURRENT_CURRENCY;
+
+            if (drawerDot) {
+                if (CURRENT_CURRENCY === "SYP") {
+                    drawerDot.style.right = "26px";
+                } else {
+                    drawerDot.style.right = "2px";
+                }
+            }
+        }
+
+        async function loadExchangeRate() {
+            try {
+                const res = await fetch(API + "/store/settings");
+                const data = await res.json();
+                EXCHANGE_RATE = Number(data.deposit_exchange_rate || data.exchange_rate) || 1;
+                document.getElementById("drawerExchangeRateText").innerText = EXCHANGE_RATE;
+            } catch (e) {
+                console.warn("Failed to load exchange rate, using default 1");
+                EXCHANGE_RATE = 1;
+                document.getElementById("drawerExchangeRateText").innerText = EXCHANGE_RATE;
+            }
+        }
+
+        function imgUrl(path) {
+            if (!path) return "";
+            if (path.startsWith("http")) return path;
+            if (path.startsWith("/")) return path;
+            return "/storage/" + path;
+        }
+
+        function createSlides() {
+            const track = document.getElementById("sliderTrack");
+            const dotsContainer = document.getElementById("sliderDots");
+            track.innerHTML = '';
+            dotsContainer.innerHTML = '';
+            if (!banners.length) {
+                const fallbackDiv = document.createElement('div');
+                fallbackDiv.className = 'slide active';
+                fallbackDiv.innerHTML = `<img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1600&auto=format&fit=crop" alt="fallback">`;
+                track.appendChild(fallbackDiv);
+                const dot = document.createElement('button');
+                dot.className = 'dot active';
+                dotsContainer.appendChild(dot);
+                return;
+            }
+            banners.forEach((banner, idx) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${idx === 0 ? 'active' : ''}`;
+                slide.innerHTML = `<img src="${imgUrl(banner)}?v=${Date.now() + idx}" loading="${idx === 0 ? 'eager' : 'lazy'}" alt="banner">`;
+                track.appendChild(slide);
+                const dot = document.createElement('button');
+                dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(idx);
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function updateSlides() {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            slides.forEach((slide, idx) => {
+                if (idx === currentIndex) slide.classList.add('active');
+                else slide.classList.remove('active');
+            });
+            dots.forEach((dot, idx) => {
+                if (idx === currentIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        function goToSlide(index) {
+            if (!banners.length) return;
+            if (index < 0) index = banners.length - 1;
+            if (index >= banners.length) index = 0;
+            currentIndex = index;
+            updateSlides();
+            resetAutoPlay();
+        }
+        function nextSlide() { goToSlide(currentIndex + 1); }
+        function startAutoPlay() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+            if (banners.length > 1) autoPlayInterval = setInterval(() => nextSlide(), 4000);
+        }
+        function stopAutoPlay() { if (autoPlayInterval) { clearInterval(autoPlayInterval); autoPlayInterval = null; } }
+        function resetAutoPlay() { stopAutoPlay(); startAutoPlay(); }
+
+        async function loadBanners() {
+            try {
+                const r = await fetch(API + "/store/settings");
+                const s = await r.json();
+                if (s.hero_banners) banners = typeof s.hero_banners === 'string' ? JSON.parse(s.hero_banners) : s.hero_banners;
+                else if (s.hero_banner) banners = [s.hero_banner];
+                else banners = [];
+                banners = banners.filter(b => b && b.trim());
+                createSlides();
+                startAutoPlay();
+            } catch(e) { banners = []; createSlides(); }
+        }
+
+        function removeLoader() {
+            const loader = document.getElementById("loaderContainer");
+            if (loader) loader.remove();
+        }
+
+        async function loadCategories(retryCount = 0) {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+
+                const headers = {
+                    "Accept": "application/json"
+                };
+
+                if (TOKEN) {
+                    headers["Authorization"] = "Bearer " + TOKEN;
+                }
+
+                const r = await fetch(API + "/store/categories", {
+                    headers,
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeout);
+
+                if (r.status === 503) {
+                    window.location.replace("/maintenance.html");
+                    return;
+                }
+
+                if (r.status === 401 || r.status === 419) {
+                    localStorage.removeItem("token");
+                    window.location.replace("/login.html");
+                    return;
+                }
+
+                if (r.status >= 500) {
+                    throw new Error("SERVER_TEMP_ERROR");
+                }
+
+                if (!r.ok) {
+                    throw new Error("HTTP_" + r.status);
+                }
+
+                const j = await r.json();
+                let categories = j.data || j.categories || j;
+
+                if (!Array.isArray(categories)) {
+                    categories = [];
+                }
+
+                const priorityOrder = [
+                    "Ø§ÙØ¹Ø§Ø¨",
+                    "ØªØ·Ø¨ÙÙØ§Øª",
+                    "Ø±ØµÙØ¯",
+                    "Ø¹ÙÙØ§Øª",
+                    "Ø³ÙØ´ÙØ§Ù ÙÙØ¯ÙØ§",
+                    "Ø¨Ø·Ø§ÙØ§Øª"
+                ];
+
+                const enriched = categories.map(c => ({
+                    ...c,
+                    name_lower: (c.name || "").toLowerCase(),
+                    products_count: c.products_count || c.count || 0
+                }));
+
+                enriched.sort((a, b) => {
+                    const aIndex = priorityOrder.findIndex(p =>
+                        a.name_lower.includes(p.toLowerCase())
+                    );
+
+                    const bIndex = priorityOrder.findIndex(p =>
+                        b.name_lower.includes(p.toLowerCase())
+                    );
+
+                    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                    if (aIndex !== -1) return -1;
+                    if (bIndex !== -1) return 1;
+
+                    return (b.products_count || 0) - (a.products_count || 0);
+                });
+
+                const box = document.getElementById("categories");
+
+                removeLoader();
+
+                box.innerHTML = "";
+
+                enriched.forEach(c => {
+                    const rawImg = c.image_url || c.image;
+
+                    const img = rawImg
+                        ? imgUrl(rawImg)
+                        : "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop";
+
+                    box.innerHTML += `
+                        <div class="card" onclick="openCategory(${c.id})">
+                            <img src="${img}" loading="lazy" alt="${c.name}">
+                            <div class="card-title">${c.name}</div>
+                        </div>
+                    `;
+                });
+
+                if (!enriched.length) {
+                    box.innerHTML = `
+                        <div style="grid-column:1/-1; text-align:center; padding:20px;">
+                            â ï¸ ÙØ§ ØªÙØ¬Ø¯ ØªØµÙÙÙØ§Øª Ø­Ø§ÙÙØ§Ù
+                        </div>
+                    `;
+                }
+
+            } catch (e) {
+                const shouldRetry =
+                    e.name === "AbortError" ||
+                    e.message === "SERVER_TEMP_ERROR" ||
+                    e.message.includes("Failed to fetch");
+
+                if (shouldRetry && retryCount < 2) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                    return;
+                }
+
+                removeLoader();
+                const box = document.getElementById("categories");
+                box.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:30px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 24px; color: var(--accent); margin-bottom: 10px; display: block;"></i>
+                        <div style="font-size: 12px; color: var(--muted);">Ø­Ø¯Ø« Ø®Ø·Ø£ ÙÙ ØªØ­ÙÙÙ Ø§ÙØªØµÙÙÙØ§Øª</div>
+                        <button onclick="location.reload()" style="margin-top: 12px; padding: 6px 16px; background: var(--accent); border: none; border-radius: 20px; color: white; font-weight: bold; cursor: pointer;">
+                            <i class="fas fa-sync-alt"></i> Ø¥Ø¹Ø§Ø¯Ø© Ø§ÙÙØ­Ø§ÙÙØ©
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        window.openCategory = function(id) { window.location.href = "/games.html?category=" + id; }
+
+        async function loadBalance() {
+            const balanceBox = document.getElementById("balanceBox");
+            if (!TOKEN) {
+                const zeroText = CURRENT_CURRENCY === "SYP"
+                    ? `0 Ù.Ø³`
+                    : "$0.00";
+                balanceBox.innerHTML = `<i class="fas fa-coins"></i> ${zeroText} <span class="add-balance" onclick="addBalance()">+</span>`;
+                return;
+            }
+            try {
+                const r = await fetch(API + "/wallet/balance", { headers: { Authorization: "Bearer " + TOKEN } });
+                if (!r.ok) throw new Error();
+                const j = await r.json();
+                let balance = 0;
+                if (typeof j === 'number') balance = j;
+                else if (j?.balance !== undefined) balance = j.balance;
+                else if (j?.data?.balance !== undefined) balance = j.data.balance;
+                balance = Number(balance) || 0;
+
+                let displayText = "";
+                if (CURRENT_CURRENCY === "SYP") {
+                    displayText = `${Math.round(balance * EXCHANGE_RATE).toLocaleString()} Ù.Ø³`;
+                } else {
+                    displayText = `$${balance.toFixed(2)}`;
+                }
+
+                balanceBox.innerHTML = `<i class="fas fa-coins"></i> ${displayText} <span class="add-balance" onclick="addBalance()">+</span>`;
+            } catch(e) {
+                balanceBox.innerHTML = `<i class="fas fa-coins"></i> $0.00 <span class="add-balance" onclick="addBalance()">+</span>`;
+            }
+        }
+
+        function updateLevelUI(level) {
+            const levelNumberBadge = document.getElementById("levelNumberBadge");
+            const vipBadge = document.getElementById("vipBadge");
+            const drawerUserNameDiv = document.getElementById("drawerUserName");
+
+            const existingDrawerBadges = drawerUserNameDiv.querySelectorAll('.drawer-level, .drawer-vip');
+            existingDrawerBadges.forEach(b => b.remove());
+
+            if (level && level.toString().trim() !== "") {
+                const levelStr = level.toString();
+                const isVip = levelStr.toLowerCase().includes('vip');
+                let levelNumber = levelStr.replace(/\D/g, '');
+
+                if (isVip || parseInt(levelNumber) >= 5) {
+                    if (vipBadge) {
+                        vipBadge.style.display = "inline-flex";
+                        vipBadge.onclick = openVipModal;
+                    }
+                    const drawerVipSpan = document.createElement("span");
+                    drawerVipSpan.className = "drawer-vip";
+                    drawerVipSpan.innerHTML = '<i class="fas fa-crown"></i> VIP';
+                    drawerVipSpan.onclick = openVipModal;
+                    drawerUserNameDiv.appendChild(drawerVipSpan);
+                    if (levelNumberBadge) levelNumberBadge.style.display = "none";
+                } else if (levelNumber && levelNumber !== "") {
+                    if (vipBadge) vipBadge.style.display = "none";
+                    if (levelNumberBadge) {
+                        levelNumberBadge.style.display = "inline-flex";
+                        levelNumberBadge.innerHTML = `<i class="fas fa-chart-line"></i> v${levelNumber}`;
+                        levelNumberBadge.onclick = openVipModal;
+                    }
+                    const drawerLevelSpan = document.createElement("span");
+                    drawerLevelSpan.className = "drawer-level";
+                    drawerLevelSpan.innerHTML = `<i class="fas fa-chart-line"></i> v${levelNumber}`;
+                    drawerLevelSpan.onclick = openVipModal;
+                    drawerUserNameDiv.appendChild(drawerLevelSpan);
+                } else {
+                    vipBadge.style.display = "none";
+                    if (levelNumberBadge) levelNumberBadge.style.display = "none";
+                }
+            } else {
+                if (vipBadge) vipBadge.style.display = "none";
+                if (levelNumberBadge) levelNumberBadge.style.display = "none";
+            }
+        }
+
+
+        function vipProgressFormat(value) {
+            const num = Number(value || 0);
+            if (num >= 1) return num.toFixed(2);
+            if (num >= 0.01) return num.toFixed(4);
+            return num.toFixed(8).replace(/\.?0+$/, '');
+        }
+
+        function renderVipProgress(data) {
+            const card = document.getElementById("vipProgressCard");
+            if (!card) return;
+
+            // Ø¥Ø°Ø§ Ø§ÙÙØ³ØªÙÙ ÙØ¯ÙÙ ÙÙ Ø§ÙØ£Ø¯ÙÙ Ø£Ù ÙØ§ ØªÙØ¬Ø¯ Ø¨ÙØ§ÙØ§Øª ØªÙØ¯ÙØ Ø£Ø®ÙÙ Ø§ÙØ´Ø±ÙØ·
+            if (!TOKEN || !data) {
+                card.style.display = "none";
+                return;
+            }
+
+            try {
+                const percent = Math.max(0, Math.min(100, Number(data.progress_percent || 0)));
+                const current = String(data.level || "v1").toUpperCase();
+
+                document.getElementById("vipProgressCurrent").innerText = current;
+                document.getElementById("vipProgressPercent").innerText = percent.toFixed(0) + "%";
+                document.getElementById("vipProgressFill").style.width = percent + "%";
+
+                if (data.is_max) {
+                    document.getElementById("vipProgressNext").innerText = "MAX";
+                    document.getElementById("vipProgressInfo").innerHTML =
+                        `Ø£Ø¹ÙÙ ÙØ³ØªÙÙ â ØµØ±ÙÙ <b>$${vipProgressFormat(data.spent || 0)}</b>`;
+                } else {
+                    const next = String(data.next_level || "v2").toUpperCase();
+                    document.getElementById("vipProgressNext").innerText = next;
+                    document.getElementById("vipProgressInfo").innerHTML =
+                        `Ø¨Ø§ÙÙ <b>$${vipProgressFormat(data.remaining || 0)}</b> ÙÙÙØµÙÙ Ø¥ÙÙ ${next}`;
+                }
+
+                card.style.display = "block";
+            } catch (e) {
+                console.warn("VIP progress render error", e);
+                card.style.display = "none";
+            }
+        }
+
+        async function loadUser() {
+            const userNameSpan = document.getElementById("userNameText");
+            const levelImage = document.getElementById("userLevelImage");
+            if (!TOKEN) {
+                const vipCard = document.getElementById("vipProgressCard");
+                if (vipCard) vipCard.style.display = "none";
+
+                if (userNameSpan) userNameSpan.innerText = "Ø²Ø§Ø¦Ø±";
+                if (levelImage) levelImage.style.display = "none";
+                document.getElementById("drawerUserName").innerHTML = "Ø²Ø§Ø¦Ø±";
+                document.getElementById("drawerAvatar").innerHTML = '<i class="fas fa-user"></i>';
+                document.getElementById("drawerUserEmail").innerText = "guest@mhdstore.com";
+                document.getElementById("drawerAuthButtons").style.display = "flex";
+                document.getElementById("logoutBox").style.display = "none";
+                updateLevelUI(null);
+                return;
+            }
+            try {
+                const r = await fetch(API + "/user/me", { headers: { Authorization: "Bearer " + TOKEN } });
+                if (!r.ok) throw new Error();
+                const j = await r.json();
+                const user = j.user || j.data || j;
+                const name = user?.name || user?.username || "User";
+                if (userNameSpan) userNameSpan.innerText = name;
+
+                const userLevel = user?.level;
+                updateLevelUI(userLevel);
+                renderVipProgress(j.level_progress || user.level_progress);
+
+                const drawerAvatar = document.getElementById("drawerAvatar");
+                if (drawerAvatar && userLevel && userLevel.toString().trim() !== "") {
+                    const lvlNum = String(userLevel).replace(/\D/g, '') || '5';
+                    drawerAvatar.innerHTML = `<img src="/images/levels/v${lvlNum}.png" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>'">`;
+                } else if (drawerAvatar) {
+                    drawerAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                }
+
+                if (userLevel && userLevel.trim() !== "") {
+                    if (levelImage) {
+                        levelImage.src = `/images/levels/v${String(userLevel).replace(/\D/g,'')}.png`;
+                        levelImage.style.display = "block";
+                    }
+                } else if (levelImage) levelImage.style.display = "none";
+
+                const drawerNameSpan = document.getElementById("drawerUserName");
+                drawerNameSpan.innerHTML = name;
+                if (userLevel) {
+                    const levelStr = userLevel.toString();
+                    const isVip = levelStr.toLowerCase().includes('vip');
+                    let levelNumber = levelStr.replace(/\D/g, '');
+                    if (isVip || parseInt(levelNumber) >= 5) {
+                        const drawerVipSpan = document.createElement("span");
+                        drawerVipSpan.className = "drawer-vip";
+                        drawerVipSpan.innerHTML = '<i class="fas fa-crown"></i> VIP';
+                        drawerVipSpan.onclick = openVipModal;
+                        drawerNameSpan.appendChild(drawerVipSpan);
+                    } else if (levelNumber && levelNumber !== "") {
+                        const drawerLevelSpan = document.createElement("span");
+                        drawerLevelSpan.className = "drawer-level";
+                        drawerLevelSpan.innerHTML = `<i class="fas fa-chart-line"></i> v${levelNumber}`;
+                        drawerLevelSpan.onclick = openVipModal;
+                        drawerNameSpan.appendChild(drawerLevelSpan);
+                    }
+                }
+
+                document.getElementById("drawerUserEmail").innerText = user?.email || "";
+                document.getElementById("drawerAuthButtons").style.display = "none";
+                document.getElementById("logoutBox").style.display = "block";
+            } catch(e) {
+                if (userNameSpan) userNameSpan.innerText = "User";
+                if (levelImage) levelImage.style.display = "none";
+                updateLevelUI(null);
+            }
+        }
+
+
+        let USER_NOTIFICATIONS = [];
+
+        async function loadNotifications() {
+            if (!TOKEN) return;
+
+            try {
+                const res = await fetch(API + "/user/notifications", {
+                    headers: { Authorization: "Bearer " + TOKEN }
+                });
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+                USER_NOTIFICATIONS = data.data || [];
+
+                document.getElementById("notifBell").style.display = "inline-flex";
+
+                const badge = document.getElementById("notifBadge");
+                const count = Number(data.unread_count || 0);
+
+                if (count > 0) {
+                    badge.innerText = count > 9 ? "9+" : count;
+                    badge.style.display = "inline-flex";
+                } else {
+                    badge.style.display = "none";
+                }
+            } catch (e) {
+                console.warn("notifications load failed");
+            }
+        }
+
+        window.openNotifications = async function() {
+            const box = document.getElementById("notifList");
+
+            if (!USER_NOTIFICATIONS.length) {
+                box.innerHTML = `<div style="text-align:center; color:var(--muted); padding:20px;">ÙØ§ ØªÙØ¬Ø¯ Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø­Ø§ÙÙØ§Ù</div>`;
+            } else {
+                box.innerHTML = USER_NOTIFICATIONS.map(n => `
+                    <div class="notif-item ${n.type || 'info'} ${n.read ? 'read' : ''}" onclick="markNotificationRead(${n.id})">
+                        <div class="notif-title">${escapeHtml(n.title || '')}</div>
+                        <div class="notif-msg">${escapeHtml(n.message || '')}</div>
+                        <div class="notif-date">${new Date(n.created_at).toLocaleString('ar-SY')}</div>
+                    </div>
+                `).join("");
+            }
+
+            document.getElementById("notifModal").classList.add("show");
+        };
+
+        window.closeNotifications = function() {
+            document.getElementById("notifModal").classList.remove("show");
+        };
+
+        window.markNotificationRead = async function(id) {
+            if (!TOKEN) return;
+            try {
+                await fetch(API + "/user/notifications/" + id + "/read", {
+                    method: "POST",
+                    headers: { Authorization: "Bearer " + TOKEN }
+                });
+                await loadNotifications();
+                openNotifications();
+            } catch(e) {}
+        };
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"']/g, m => ({
+                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+            }[m]));
+        }
+
+        async function loadApiStatus() {
+            if (!TOKEN) return;
+
+            try {
+                const res = await fetch(API + "/user/api-status", {
+                    headers: {
+                        Authorization: "Bearer " + TOKEN
+                    }
+                });
+
+                const data = await res.json();
+
+                if (!data.enabled) return;
+
+                document.getElementById("apiMenuItem").style.display = "block";
+
+                window.USER_API_KEY = data.api_key;
+                window.USER_API_IPS = data.allowed_ips || [];
+
+            } catch (e) {
+                console.warn("API status failed");
+            }
+        }
+
+        window.openApiPanel = function() {
+            document.getElementById("apiPanel").style.display = "flex";
+            document.getElementById("apiKeyBox").innerText = window.USER_API_KEY || "ÙØ§ ÙÙØ¬Ø¯ ÙÙØªØ§Ø­ API";
+            document.getElementById("apiIpsInput").value = (window.USER_API_IPS || []).join(",");
+        };
+
+        window.closeApiPanel = function() {
+            document.getElementById("apiPanel").style.display = "none";
+        };
+
+        window.saveApiIps = async function() {
+            if (!TOKEN) {
+                alert("Ø§ÙØ±Ø¬Ø§Ø¡ ØªØ³Ø¬ÙÙ Ø§ÙØ¯Ø®ÙÙ Ø£ÙÙØ§Ù");
+                return;
+            }
+
+            const ipsInput = document.getElementById("apiIpsInput").value;
+            const ips = ipsInput
+                .split(",")
+                .map(i => i.trim())
+                .filter(i => i);
+
+            try {
+                const res = await fetch(API + "/user/api-ips", {
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + TOKEN,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ ips })
+                });
+
+                const data = await res.json();
+
+                if (data.status) {
+                    alert("â ØªÙ Ø­ÙØ¸ Ø§ÙÙ IPs Ø¨ÙØ¬Ø§Ø­");
+                    window.USER_API_IPS = ips;
+                    closeApiPanel();
+                } else {
+                    alert("â ÙØ´Ù Ø§ÙØ­ÙØ¸: " + (data.message || "Ø®Ø·Ø£ ØºÙØ± ÙØ¹Ø±ÙÙ"));
+                }
+            } catch (e) {
+                alert("â Ø®Ø·Ø£ ÙÙ Ø§ÙØ§ØªØµØ§Ù Ø¨Ø§ÙØ®Ø§Ø¯Ù");
+            }
+        };
+
+        async function openVipModal(event) {
+            if (event) event.stopPropagation();
+            try {
+                const res = await fetch(API + "/store/settings");
+                const data = await res.json();
+
+                const levels = {
+                    v2: data.level_v2 || 0,
+                    v3: data.level_v3 || 0,
+                    v4: data.level_v4 || 0,
+                    v5: data.level_v5 || 0,
+                };
+
+                const box = document.getElementById("vipLevelsBox");
+                box.innerHTML = "";
+
+                Object.entries(levels).forEach(([lvl, val]) => {
+                    box.innerHTML += `
+                        <div style="
+                            background: var(--card-soft);
+                            padding:10px;
+                            border-radius:10px;
+                            display:flex;
+                            justify-content:space-between;
+                            font-weight:bold;
+                        ">
+                            <span>${lvl.toUpperCase()}</span>
+                            <span>$${val}</span>
+                        </div>
+                    `;
+                });
+
+                document.getElementById("vipModal").style.display = "flex";
+
+            } catch (e) {
+                alert("Ø®Ø·Ø£ Ø¨ØªØ­ÙÙÙ Ø§ÙÙØ³ØªÙÙØ§Øª");
+            }
+        }
+
+        window.closeVipModal = function() {
+            document.getElementById("vipModal").style.display = "none";
+        };
+
+        function updateActiveNav() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') && currentPath.includes(item.getAttribute('href'))) item.classList.add('active');
+            });
+            if (!document.querySelector('.nav-item.active')) document.getElementById('navHome')?.classList.add('active');
+        }
+
+        function setupLevelImagePopup() {
+            const levelImg = document.getElementById("userLevelImage");
+            if (levelImg) {
+                levelImg.onclick = function(e) {
+                    e.stopPropagation();
+                    if (!this.src || this.style.display === 'none') return;
+
+                    const popup = document.createElement("div");
+                    popup.style.cssText = `
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(0,0,0,0.95);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 9999;
+                        cursor: pointer;
+                    `;
+
+                    const imgElement = document.createElement("img");
+                    imgElement.src = this.src;
+                    imgElement.style.cssText = `
+                        max-width: 85%;
+                        max-height: 85%;
+                        border-radius: 20px;
+                        box-shadow: 0 0 40px rgba(204,0,0,0.5);
+                        border: 2px solid var(--accent);
+                        transition: transform 0.2s ease;
+                    `;
+
+                    popup.appendChild(imgElement);
+                    popup.onclick = () => popup.remove();
+                    document.body.appendChild(popup);
+                };
+            }
+        }
+
+
+        window.closeChannelsModal = function() {
+            document.getElementById("channelsModal").classList.remove("show");
+            localStorage.setItem("channels_popup_closed", "1");
+        };
+
+        function showChannelsModalOnce() {
+            if (localStorage.getItem("channels_popup_closed") === "1") return;
+            setTimeout(() => {
+                document.getElementById("channelsModal")?.classList.add("show");
+            }, 700);
+        }
+
+        const fabBtn = document.getElementById('fabMainBtn');
+        const fabOptionsDiv = document.getElementById('fabOptions');
+        if (fabBtn) {
+            fabBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fabOptionsDiv.classList.toggle('open');
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.floating-purple')) {
+                    fabOptionsDiv.classList.remove('open');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadExchangeRate();
+            updateCurrencyUI();
+            await loadUser();
+            await loadBalance();
+            await loadCategories();
+            await loadBanners();
+            await loadApiStatus();
+            await loadNotifications();
+            setupLevelImagePopup();
+            updateActiveNav();
+            showChannelsModalOnce();
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.drawer') && !e.target.closest('.menu-btn')) {
+                    toggleDrawer(false);
+                }
+            });
+        });
+    })();
+</script>
+<!-- Firebase Push Notifications -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+const FCM_TOKEN = localStorage.getItem("token");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBxBXwtz_YiowSC-TiZAb3E2aHZgc3U_So",
+  authDomain: "mhdstore-2cbc1.firebaseapp.com",
+  projectId: "mhdstore-2cbc1",
+  storageBucket: "mhdstore-2cbc1.firebasestorage.app",
+  messagingSenderId: "697350434278",
+  appId: "1:697350434278:web:75160d75736095b8023a27",
+  measurementId: "G-XSMFHYYTXW"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+async function initPushNotifications() {
+  try {
+    if (!("Notification" in window)) return;
+    if (!("serviceWorker" in navigator)) return;
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      console.log("Notifications permission denied");
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+
+    const token = await getToken(messaging, {
+      vapidKey: "BLt5V4fB-i9fpiMi6BMDwDHd6B0tUmPD6OWogUMB1zl3SbLNWB_jOi6z4k10S4nRDqzDC8_o-gHrBJc1J65LIV4",
+      serviceWorkerRegistration: registration
+    });
+
+    console.log("FCM TOKEN:", token);
+
+    if (FCM_TOKEN && token) {
+      await fetch("https://mhd-game.com/api/user/fcm-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + FCM_TOKEN
+        },
+        body: JSON.stringify({ token })
+      });
+    }
+  } catch (err) {
+    console.error("Firebase notification error:", err);
+  }
+}
+
+initPushNotifications();
+
+onMessage(messaging, (payload) => {
+  new Notification(payload.notification?.title || "MHD Store", {
+    body: payload.notification?.body || "ÙØ¯ÙÙ Ø¥Ø´Ø¹Ø§Ø± Ø¬Ø¯ÙØ¯",
+    icon: "/images/logo.png",
+    badge: "/images/logo.png"
+  });
+});
+</script>
+
+</body>
+</html>
+<style>
+/* FORCE floating support button position */
+.floating-purple {
+    position: fixed !important;
+    bottom: 48px !important;
+    left: 15px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+}
+
+.fab-options {
+    display: flex !important;
+    flex-direction: column !important;
+    transform: translateY(16px) !important;
+}
+
+.fab-options.open {
+    transform: translateY(-12px) !important;
+}
+  </style>
